@@ -1,5 +1,6 @@
 #include "Solver.h"
 #include "Ligand.h"
+#include "LigandCSVLoader.h"
 #include <iostream>
 
 int main() {
@@ -7,7 +8,7 @@ int main() {
     std::cout << "=====================================" << std::endl;
 
     // Initialize ligand data from CSV
-    InitializeLigandData();
+    LoadLigandDataFromCSV("ligands.csv");
 
     // Create solver instance
     CationSystem solver;
