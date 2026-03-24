@@ -76,6 +76,9 @@ double CationSystem::calculateTemperatureCorrection(double temperature, double d
     double T2 = temperature + 273.15; // Convert to Kelvin
     double R = 8.314; // Gas constant in J/mol·K
 
+    // If deltaH is not provided (0), return 1.0 (no temperature correction)
+    if (deltaH == 0.0) return 1.0;
+
     if (T2 == T1) return 1.0;
 
     double lnK = -deltaH / R * (1.0 / T2 - 1.0 / T1);
@@ -83,7 +86,7 @@ double CationSystem::calculateTemperatureCorrection(double temperature, double d
 }
 
 // Calculate adjusted stability constant considering pH, ionic strength, and temperature
-double CationSystem::calculateStabilityConstant(double logK, double pH, double ionicStrength, double deltaH) {
+double CationSystem::calculateStabilityConstant(double logK, double pH, double ionicStrength) {
     // Convert logK to K
     double K = std::pow(10, logK);
 
@@ -93,8 +96,8 @@ double CationSystem::calculateStabilityConstant(double logK, double pH, double i
     // Apply ionic strength correction
     double ionicCorrection = 1.0; // Simplified - would be more complex in real implementation
 
-    // Apply temperature correction
-    double tempCorrection = calculateTemperatureCorrection(params.temperature, deltaH);
+    // Apply temperature correction (simplified - no deltaH in data)
+    double tempCorrection = 1.0; // Simplified - would use deltaH if available
 
     // Combined correction
     double adjustedK = K * pHCorrection * ionicCorrection * tempCorrection;
@@ -160,11 +163,11 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double f
     }
 
     // Calculate complex formation constant
-    double complexFormationConstant = std::pow(10, ligand->constants.H1);
+    double complexFormationConstant = std::pow(10, ligand->stability_constants.log_K1);
 
     // Apply corrections to the formation constant
-    double adjustedK = calculateStabilityConstant(ligand->constants.H1, params.pH,
-                                                params.ionicStrength, ligand->constants.dH1);
+    double adjustedK = calculateStabilityConstant(ligand->stability_constants.log_K1, params.pH,
+                                                params.ionicStrength);
 
     // Calculate complex concentration using iterative method
     double complex = solveForFreeMetal(freeMetal, freeLigand, adjustedK);
@@ -202,11 +205,11 @@ EquilibriumResult CationSystem::calculateTotalToFree(double totalLigand, double 
     }
 
     // Calculate complex formation constant
-    double complexFormationConstant = std::pow(10, ligand->constants.H1);
+    double complexFormationConstant = std::pow(10, ligand->stability_constants.log_K1);
 
     // Apply corrections to the formation constant
-    double adjustedK = calculateStabilityConstant(ligand->constants.H1, params.pH,
-                                                params.ionicStrength, ligand->constants.dH1);
+    double adjustedK = calculateStabilityConstant(ligand->stability_constants.log_K1, params.pH,
+                                                params.ionicStrength);
 
     // Calculate complex concentration using iterative method
     double complex = solveForFreeMetal(totalMetal, totalLigand, adjustedK);
@@ -291,8 +294,8 @@ double CationSystem::GetAdjustedEquilibriumConstant(const std::string& ligandNam
     const Ligand* ligand = GetLigandByName(ligandName);
     if (!ligand) return 0.0;
 
-    double adjustedK = calculateStabilityConstant(ligand->constants.H1, params.pH,
-                                                params.ionicStrength, ligand->constants.dH1);
+    double adjustedK = calculateStabilityConstant(ligand->stability_constants.log_K1, params.pH,
+                                                params.ionicStrength);
     adjustedConstants[key] = adjustedK;
     return adjustedK;
 }

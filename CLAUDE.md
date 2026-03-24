@@ -35,6 +35,19 @@ Calculate free vs. total concentrations for divalent cations (Ca2+, Mg2+, Ba2+, 
 - **Compilation:** Use `-static` and `-mwindows` for the final .exe.
 - **Protocol:** If build fails, read `build_errors.log` and self-correct the code or `build.sh`.
 
+## Data Governance & CSV Integrity
+1. **Read-Only Constants:** The file `ligands.csv` is the validated scientific "Source of Truth." The agent is **strictly forbidden** from overwriting, "correcting," or modifying this file's contents unless specifically instructed to add a *new* ligand.
+2. **Parser Alignment:** If the solver produces unexpected results, the agent must first verify its own CSV parsing logic (column mapping) before questioning the data in the file.
+3. **Backup Requirement:** If a new ligand is added, the agent MUST create a backup (e.g., `ligands.csv.bak`) before the modification.
+
 ## Verification Protocols
 - **Data Integrity:** Cross-reference legacy LogK/ΔH values against NIST/IUPAC via web-search.
 - **Discrepancy Log:** Document differences >0.05 LogK in `docs/CONSTANTS_LOG.md`. Modern values prioritize NIST/IUPAC standards.
+
+## Git & Attribution Protocol
+1. **Commit Messages:** When preparing a commit, always include the attribution block:
+   - Supervisor: Gemini
+   - Agent: Claude Code
+   - Local LLM: Qwen-Coder (Ollama)
+2. **Formatting:** Use the template structure: `[Module]: Description`.
+3. **Atomic Commits:** Commit after each successful validation (e.g., after fixing the CSV parser).

@@ -62,15 +62,15 @@ EquilibriumConcentrations CationEngine::CalculateEquilibrium(double totalLigand,
     // Simplified equilibrium calculation (this would be more complex in a full implementation)
     // For now, we'll provide a basic framework
 
-    // Calculate protonation fractions (simplified)
-    double alpha1 = 1.0 / (1.0 + std::pow(10, ligand->constants.H1 - pH));
-    double alpha2 = 1.0 / (1.0 + std::pow(10, ligand->constants.H2 - pH));
-    double alpha3 = 1.0 / (1.0 + std::pow(10, ligand->constants.H3 - pH));
-    double alpha4 = 1.0 / (1.0 + std::pow(10, ligand->constants.H4 - pH));
+    // Calculate protonation fractions (simplified - using log_K1 instead of H1)
+    double alpha1 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K1 - pH));
+    double alpha2 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K2 - pH));
+    double alpha3 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K3 - pH));
+    double alpha4 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K4 - pH));
 
     // For a simple 1:1 complex formation (this is a simplification)
     // In reality, this would involve solving a system of equations
-    double complexFormationConstant = std::pow(10, ligand->constants.H1); // Simplified
+    double complexFormationConstant = std::pow(10, ligand->stability_constants.log_K1); // Simplified
 
     // Basic equilibrium calculation
     double freeLigand = totalLigand * alpha1;  // Simplified
@@ -94,7 +94,7 @@ EquilibriumConcentrations CationEngine::CalculateEquilibrium(double totalLigand,
 StabilityConstants CationEngine::GetStabilityConstants(const std::string& ligandName) {
     const Ligand* ligand = GetLigandByName(ligandName);
     if (ligand) {
-        return ligand->constants;
+        return ligand->stability_constants;
     }
     return StabilityConstants();
 }

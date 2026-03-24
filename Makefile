@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2
 INCLUDES = -Iinclude
-SOURCES = src/LigandData.cpp src/CationEngine.cpp src/Solver.cpp
+SOURCES = src/LigandCSVLoader.cpp src/CationEngine.cpp src/Solver.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLES = cation_engine_main cation_engine_test
 

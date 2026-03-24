@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/cation_engine_main.dir/link.d CMakeFiles/cation_engine_main.dir/main.cpp.o -o cation_engine_main  libcation_engine.a

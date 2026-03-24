@@ -1,0 +1,5 @@
+/mnt/programming/cation-engine/build/CMakeFiles/cation_engine.dir
+/mnt/programming/cation-engine/build/CMakeFiles/cation_engine_test.dir
+/mnt/programming/cation-engine/build/CMakeFiles/cation_engine_main.dir
+/mnt/programming/cation-engine/build/CMakeFiles/edit_cache.dir
+/mnt/programming/cation-engine/build/CMakeFiles/rebuild_cache.dir

@@ -10,6 +10,7 @@ include_directories(include)
 # Create the library
 add_library(cation_engine
     src/LigandData.cpp
+    src/LigandCSVLoader.cpp
     src/CationEngine.cpp
     src/Solver.cpp
 )

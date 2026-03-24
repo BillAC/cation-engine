@@ -1,9 +1,13 @@
 #include "Solver.h"
+#include "Ligand.h"
 #include <iostream>
 
 int main() {
     std::cout << "Cation-Ligand Equilibrium Solver Demo" << std::endl;
     std::cout << "=====================================" << std::endl;
+
+    // Initialize ligand data from CSV
+    InitializeLigandData();
 
     // Create solver instance
     CationSystem solver;

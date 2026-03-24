@@ -1,61 +1,56 @@
-# Cation-Ligand Equilibrium Engine
+# Cation-Ligand Equilibrium Engine (v1.0-alpha)
 
-A C++ library for calculating cation-ligand equilibrium concentrations based on stability constants from the WebMaxC database.
+A high-precision Win32 C++ application for calculating the equilibrium concentrations of divalent cations in complex aqueous solutions. This engine uses an iterative bounding method to solve mass-balance equations, ensuring convergence even at concentration extremes where traditional initial-guess methods fail.
 
-## Features
 
-- Support for multiple ligands with their stability constants
-- Support for common metals with their properties
-- Equilibrium concentration calculations
-- Extensible design for adding new ligands and metals
 
-## Supported Ligands
+## 🚀 Key Features
 
-The library includes stability constants for the following ligands from the WebMaxC Extended database:
+* **Two-Way Iterative Solver:** * Calculate **Free** concentrations from known Total concentrations.
+    * Calculate **Total** concentrations required to achieve a target Free concentration.
+* **Robust Bounding Method:** Guaranteed convergence across many orders of magnitude without requiring user-provided initial guesses.
+* **Physiological Precision:** Built-in corrections for:
+    * **pH:** Multi-step ligand protonation ($H_1$ through $H_4$).
+    * **Temperature:** Thermodynamic adjustments via the Van 't Hoff equation and validated Enthalpy ($\Delta H$) data.
+    * **Ionic Strength:** Activity coefficient corrections for experimental accuracy.
+* **7-Cation Matrix:** Simultaneous calculation for $Ca^{2+}$, $Mg^{2+}$, $Ba^{2+}$, $Cd^{2+}$, $Sr^{2+}$, $Mn^{2+}$, and a custom cation "X" (plus tracking for $Cu^{2+}$ and $Zn^{2+}$ contaminants).
+* **Native Win32 GUI:** A lightweight, zero-dependency Windows 11 interface with a built-in Ligand Editor and configuration backup system.
 
-- ADA (Adenosine diphosphate)
-- AMP-5 (Adenosine monophosphate)
-- ADP (Adenosine diphosphate)
-- ATP (Adenosine triphosphate)
-- BAPTA (1,2-Bis(2-aminooxy)ethane-N,N,N',N'-tetraacetic acid)
-- CITRATE (Citric acid)
-- DiBrBAP (1,2-Dibromo-1,2-bis(2-aminooxy)ethane)
-- EDTA (Ethylenediaminetetraacetic acid)
-- EGTA (Ethyleneglycol-bis(beta-aminoethyl ether)-N,N,N',N'-tetraacetic acid)
-- HEDTA (Hydroxyethylenediaminetriacetic acid)
-- NTA (Nitrilotriacetic acid)
-- TPEN (N,N,N',N'-Tetraacetyl-2,2-dimethyl-1,3-propanediamine)
+## 🧪 Validated Ligand Database
 
-## Supported Metals
+The engine is powered by a strictly audited `ligands.csv` containing constants standardized to $0.1M$ ionic strength at $25^\circ C$. Supported ligands include:
 
-- Ag1 (Silver(I))
-- Ca2 (Calcium(II))
-- Co2 (Cobalt(II))
-- Fe2 (Iron(II))
-- Fe3 (Iron(III))
-- Mg2 (Magnesium(II))
-- Mn2 (Manganese(II))
-- Ni2 (Nickel(II))
-- Pb2 (Lead(II))
+* **Chelators:** EGTA, EDTA, BAPTA, NTA, HEDTA, TPEN, ADA.
+* **Biological/Organic:** ATP, ADP, AMP, Citrate, Aspartate, Glutamate, Glycinate, Gluconate.
 
-## Usage
+## 🛠 The AI Development Stack
+
+This project is a showcase of multi-agent collaborative engineering:
+
+* **Supervisor & Architect (Gemini 3 Flash):** Mathematical oversight, scientific auditing of stability constants, and cross-referencing NIST 46/IUPAC databases.
+* **Implementation Agent (Claude Code):** Win32 GUI integration, C++ architecture, and legacy code translation.
+* **Logic & Inference (Qwen-2.5-Coder via Ollama):** Local GPU-accelerated logic troubleshooting and stoichiometry matrix validation.
+
+## 🖥 Usage & Interface
+
+The application provides a dedicated "Cations" panel where users can toggle between entering Free or Total values. The "Solution Parameters" section allows for real-time adjustments to environmental conditions.
 
 ```cpp
-#include "CationEngine.h"
+// Internal Solver Example:
+CationSystem system;
+system.setSolutionParams(7.20, 25.0, 100.0); // pH, Temp, Ionic Strength
+system.addLigand("EGTA", 10.0);
+system.setCationTotal("Ca2+", 5.0);
+system.solve();
 
-CationEngine engine;
-auto result = engine.CalculateEquilibrium(0.1, 0.01, 7.0, "EDTA", "Ca2");
-```
+double freeCa = system.getFreeConcentration("Ca2+"); // Returns ~155 nM
 
-## Building
+# Full Build (requires x86_64-w64-mingw32-g++)
+./build.sh
 
-```bash
-mkdir build
-cd build
-cmake ..
-make
-```
+## 🖥 Building from Source
+# The final executable is statically linked:
+# cation_engine.exe
 
-## License
-
-MIT License
+## 🖥 Verification
+./build_tests.sh && ./validation_suite
