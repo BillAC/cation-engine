@@ -1,0 +1,982 @@
+
+<!-- saved from url=(0045)http://web.stanford.edu/~cpatton/webmaxcS.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>WEBMAXC STANDARD</title>
+<script language="JavaScript">
+var mcd = new Array(
+"%THE NEW FORMAT FOR THE FILES OF CONSTANTS IN MAXCHELATOR",
+"%Chelator lines start with ! and name is 7 characters max.",
+"%Values are separated with a comma.",
+"%!C-NAME, H1, H2, H3, H4, dH1, dH2, dH3, dH4",
+"%Metals start with a # are 2 characters followed by valence.",
+"%#Mt2, ML, MHL, dML, dMHL, comments",
+"%The same metals in the same order are required for each chelator",
+"!ADA    ,   6.710,   2.300,   1.590,   0.000,  -2.900,   0.000,   0.000,   0.000,",
+"#Al3,   0.000,   0.000,   0.000,   0.000,",
+"#Ba2,   0.000,   0.000,   0.000,   0.000,",
+"#Ca2,   4.010,   0.000,  -2.000,   0.000,NIST",
+"#Cd2,   0.000,   0.000,   0.000,   0.000,",
+"#Cu2,   9.680,   0.000,   0.000,   0.000,NIST 20/0.1",
+"#Fe2,   0.000,   0.000,   0.000,   0.000,",
+"#Mg2,   2.470,   0.000,   5.000,   0.000,NIST",
+"#Sr2,   2.990,   0.000,  -1.000,   0.000,NIST",
+"#Zn2,   7.300,   0.000,   0.000,   0.000,NIST 20/0.1",
+"!AMP-5  ,   6.202,   3.854,   0.000,   0.000,   0.800,  -4.000,   0.000,   0.000,",
+"#Al3,   6.170,   0.000,   0.000,   0.000,NIST 25/0.1",
+"#Ba2,   1.690,   0.000,   0.000,   0.000,NIST 25/0.1",
+"#Ca2,   1.825,   0.000,  -1.000,   0.000,NIST",
+"#Cd2,   0.000,   0.000,   0.000,   0.000,",
+"#Cu2,   3.265,   0.000,  -6.200,   0.000,NIST",
+"#Fe2,   1.980,   0.000,   0.000,   0.000,",
+"#Mg2,   1.895,   0.000,   1.800,   0.000,NIST",
+"#Sr2,   1.750,   0.000,   0.000,   0.000,NIST 25/0.1",
+"#Zn2,   2.720,   0.000,   0.000,   0.000,NIST 25/0.1",
+"!ADP    ,   6.374,   3.924,   0.000,   0.000,   0.600,  -4.000,   0.000,   0.000,",
+"#Al3,   7.820,   4.790,   0.000,   0.000,NIST 25/0.1",
+"#Ba2,   2.360,   1.340,   0.000,   0.000,NIST 25/0.1",
+"#Ca2,   2.839,   1.469,   2.300,   1.500,NIST",
+"#Cd2,   0.000,   0.000,   0.000,   0.000,",
+"#Cu2,   5.880,   2.620,   0.000,   0.000,NIST 25/0.1",
+"#Fe2,   4.730,   0.000,   0.000,   0.000,",
+"#Mg2,   3.211,   1.555,   3.700,   1.800,NIST",
+"#Sr2,   2.540,   1.410,   0.000,   0.000,NIST 25/0.1",
+"#Zn2,   4.220,   2.040,   0.000,   0.000,NIST 25/0.1",
+"!ATP    ,   6.476,   4.039,   0.000,   0.000,   0.500,  -3.600,   0.000,   0.000,",
+"#Al3,   7.920,   4.990,   0.000,   0.000,NIST 25/0.1",
+"#Ba2,   3.180,   1.880,   0.000,   0.000,NIST 25/0.1",
+"#Ca2,   3.828,   2.144,   3.200,   1.900,NIST",
+"#Cd2,   5.320,   3.000,   0.000,   0.000,NIST 25/0.1",
+"#Cu2,   6.428,   3.651,   0.800,  -3.500,NIST",
+"#Fe2,   5.610,   0.000,   2.610,   0.000,",
+"#Mg2,   4.143,   2.299,   4.400,   2.300,NIST",
+"#Sr2,   3.430,   2.080,   0.000,   0.000,NIST 25/0.1",
+"#Zn2,   5.169,   2.695,   3.900,   1.100,NIST",
+"!BAPTA  ,   6.372,   5.491,   3.260,   2.200,  -4.000,  -3.000,   0.000,   0.000,",
+"#Al3,   0.000,   0.000,   0.000,   0.000,",
+"#Ba2,   0.000,   0.000,   0.000,   0.000,",
+"#Ca2,   6.970,   0.000,   0.000,   0.000,NIST 20/0.1",
+"#Cd2,   0.000,   0.000,   0.000,   0.000,",
+"#Cu2,   0.000,   0.000,   0.000,   0.000,",
+"#Fe2,   0.000,   0.000,   0.000,   0.000,",
+"#Mg2,   1.770,   0.000,   0.000,   0.000,NIST 20/0.1",
+"#Sr2,   0.000,   0.000,   0.000,   0.000,",
+"#Zn2,   0.000,   0.000,   0.000,   0.000,",
+"!CITRATE,   5.696,   4.363,   2.919,   0.000,   0.460,  -0.750,  -1.080,   0.000,",
+"#Al3,   8.040,   5.160,   0.000,   0.000,NIST 25/0.1",
+"#Ba2,   2.800,   1.480,   0.000,   0.000,NIST 25/0.1",
+"#Ca2,   3.533,   2.090,  -2.000,  -1.000,NIST",
+"#Cd2,   3.673,   2.188,   2.000,   0.000,NIST",
+"#Cu2,   5.900,   3.593,   0.000,   2.000,NIST + GUESS",
+"#Fe2,   4.400,   2.900,   0.000,   0.000,NIST Na/20/0.1/25/0.",
+"#Mg2,   3.493,   1.854,   2.000,   0.000,NIST",
+"#Sr2,   2.990,   1.720,   0.000,   0.000,NIST Na 25/0.1",
+"#Zn2,   4.943,   2.978,   2.000,   0.000,NIST",
+"!DiBrBAP,   5.600,   4.570,   1.000,   1.000,   0.000,   0.000,   0.000,   0.000,",
+"#Al3,   0.000,   0.000,   0.000,   0.000,",
+"#Ba2,   0.000,   0.000,   0.000,   0.000,",
+"#Ca2,   5.960,   0.000,   5.530,   0.000,GUESS",
+"#Cd2,   0.000,   0.000,   0.000,   0.000,",
+"#Cu2,   0.000,   0.000,   0.000,   0.000,",
+"#Fe2,   0.000,   0.000,   0.000,   0.000,",
+"#Mg2,   1.000,   0.000,   0.000,   0.000,GUESS",
+"#Sr2,   0.000,   0.000,   0.000,   0.000,",
+"#Zn2,   0.000,   0.000,   0.000,   0.000,",
+"!EDTA   ,  10.262,   6.186,   2.677,   2.004,  -5.600,  -4.200,   1.500,   0.300,",
+"#Al3,  16.254,   8.652,  12.600,  -3.900,NIST",
+"#Ba2,   7.950,   0.000,  -5.000,   0.000,NIST",
+"#Ca2,  10.734,   3.652,  -6.100,   0.000,NIST 2nd metal 20C",
+"#Cd2,  16.622,   9.269,  -9.100,  -0.400,NIST",
+"#Cu2,  18.890,  11.757,  -8.200,  -2.000,NIST",
+"#Fe2,  14.358,   6.840,  -4.000,  -1.000,NIST",
+"#Mg2,   8.755,   2.343,   3.400,   0.000,NIST 2d metal 20C",
+"#Sr2,   8.779,   2.447,  -4.100,   0.000,NIST 2nd metal 20C",
+"#Zn2,  16.566,   9.304,  -4.700,   0.000,NIST 2nd metal 25C",
+"!EGTA   ,   9.476,   8.866,   2.738,   1.913,  -5.900,  -5.800,  -2.600,  -0.400,",
+"#Al3,  13.900,   8.394,   0.000,   0.000,NIST Na 25C",
+"#Ba2,   8.419,   4.253,  -8.900,   0.000,NIST 2nd metal 20C",
+"#Ca2,  10.973,   5.307,  -8.400,   0.000,NIST 2nd metal 20C",
+"#Cd2,  16.693,  10.217, -14.800,   0.000,NIST 2nd metal 20C",
+"#Cu2,  17.845,  12.729, -11.000,   0.000,NIST 2nd metal 20C",
+"#Fe2,  11.873,   6.867,  -5.200,   0.000,NIST 2nd metal 20C",
+"#Mg2,   5.223,   3.377,   5.200,   0.000,NIST 2nd metal 20C",
+"#Sr2,   8.503,   4.357,  -6.000,   0.000,NIST 2nd metal 20C",
+"#Zn2,  12.661,   8.145,  -4.300,   0.000,NIST 2nd metal 20C",
+"!HEDTA  ,   9.955,   5.423,   2.612,   1.600,  -6.600,  -3.100,   1.100,   0.000,",
+"#Al3,  14.299,   6.484,   9.000,   0.000,NIST 2nd metal 25C",
+"#Ba2,   6.275,   0.000,  -5.400,   0.000,NIST",
+"#Ca2,   8.189,   0.000,  -6.500,   0.000,NIST",
+"#Cd2,  13.837,   6.182, -10.300,   0.000,NIST 2nd mtl Na 25C",
+"#Cu2,  17.525,  10.020,  -9.400,   0.000,NIST 2nd metal 25C",
+"#Fe2,  12.283,   5.128,  -6.000,  -1.000,NIST",
+"#Mg2,   6.965,   0.000,   3.400,   0.000,NIST",
+"#Sr2,   6.873,   0.000,  -5.200,   0.000,NIST",
+"#Zn2,  14.713,   0.000,  -8.400,   0.000,NIST",
+"!NTA    ,   9.719,   2.521,   1.811,   0.983,  -4.600,   0.200,   0.400,   2.000,",
+"#Al3,  11.600,   3.781,   0.000,   0.000,NIST 25/0.1",
+"#Ba2,   4.836,   0.000,  -1.440,   0.000,NIST",
+"#Ca2,   6.465,   0.000,  -1.360,   0.000,NIST",
+"#Cd2,   9.818,   0.000,  -4.000,   0.000,NIST",
+"#Cu2,  13.030,   4.911,  -1.900,   0.000,NIST 2nd metal 25C",
+"#Fe2,   8.820,   0.000,   0.000,   0.000,NIST 20/0.1",
+"#Mg2,   5.454,   0.000,   4.300,   0.000,NIST",
+"#Sr2,   5.004,   0.000,  -0.540,   0.000,NIST",
+"#Zn2,  10.670,   0.000,  -0.900,   0.000,NIST",
+"!TPEN   ,   7.194,   4.866,   3.353,   2.958,  -5.800,  -4.200,  -3.800,  -5.600,",
+"#Al3,   0.000,   0.000,   0.000,   0.000,",
+"#Ba2,   0.000,   0.000,   0.000,   0.000,",
+"#Ca2,   0.000,   0.000,   0.000,   0.000,",
+"#Cd2,  16.329,   0.000, -18.800,   0.000,NIST",
+"#Cu2,  20.489,   0.000, -22.800,   0.000,NIST",
+"#Fe2,  14.609,   0.000, -18.000,   0.000,NIST",
+"#Mg2,   0.000,   0.000,   0.000,   0.000,",
+"#Sr2,   0.000,   0.000,   0.000,   0.000,",
+"#Zn2,  15.589,   0.000, -14.800,   0.000,NIST");
+
+//javascript arrays always start with 0, # elements therefore = array(#) + 1
+var chelatornames = new Array(11);
+var metalnames = new Array(8);
+var conavailable = new Array(11);
+var freechelatoramount = new Array(11);
+var freemetalamount = new Array(8);
+var totalchelatoramount = new Array(11);
+var totalmetalamount = new Array(8);
+var pH, temperature, ionic, ioncont;
+var h1 = new Array(11); //first hydrogen constant for the chelators
+var h2 = new Array(11);
+var h3 = new Array(11);
+var h4 = new Array(11);
+var dh1 = new Array(11); //delta H constant for H1
+var dh2 = new Array(11);
+var dh3 = new Array(11);
+var dh4 = new Array(11);
+var mc = new Array(11);
+mc[0] = new Array(8); //first metal-chelator constant
+mc[1] = new Array(8);
+mc[2] = new Array(8);
+mc[3] = new Array(8);
+mc[4] = new Array(8);
+mc[5] = new Array(8);
+mc[6] = new Array(8);
+mc[7] = new Array(8);
+mc[8] = new Array(8);
+mc[9] = new Array(8);
+mc[10] = new Array(8);
+mc[11] = new Array(8);
+var dmc = new Array(11); //first delta metal-chelator constant
+dmc[0] = new Array(8);
+dmc[1] = new Array(8);
+dmc[2] = new Array(8);
+dmc[3] = new Array(8);
+dmc[4] = new Array(8);
+dmc[5] = new Array(8);
+dmc[6] = new Array(8);
+dmc[7] = new Array(8);
+dmc[8] = new Array(8);
+dmc[9] = new Array(8);
+dmc[10] = new Array(8);
+dmc[11] = new Array(8);
+var mhc = new Array(11); //second metal-chelator constant
+mhc[0] = new Array(8); 
+mhc[1] = new Array(8);
+mhc[2] = new Array(8);
+mhc[3] = new Array(8);
+mhc[4] = new Array(8);
+mhc[5] = new Array(8);
+mhc[6] = new Array(8);
+mhc[7] = new Array(8);
+mhc[8] = new Array(8);
+mhc[9] = new Array(8);
+mhc[10] = new Array(8);
+mhc[11] = new Array(8);
+var dmhc = new Array(11); //second delta metal-chelator constant
+dmhc[0] = new Array(8);
+dmhc[1] = new Array(8);
+dmhc[2] = new Array(8);
+dmhc[3] = new Array(8);
+dmhc[4] = new Array(8);
+dmhc[5] = new Array(8);
+dmhc[6] = new Array(8);
+dmhc[7] = new Array(8);
+dmhc[8] = new Array(8);
+dmhc[9] = new Array(8);
+dmhc[10] = new Array(8);
+dmhc[11] = new Array(8);
+
+//intermediate calculations stored here:
+var ZMC = new Array(11);
+ZMC[0] = new Array(8);
+ZMC[1] = new Array(8);
+ZMC[2] = new Array(8);
+ZMC[3] = new Array(8);
+ZMC[4] = new Array(8);
+ZMC[5] = new Array(8);
+ZMC[6] = new Array(8);
+ZMC[7] = new Array(8);
+ZMC[8] = new Array(8);
+ZMC[9] = new Array(8);
+ZMC[10] = new Array(8);
+ZMC[11] = new Array(8);
+
+var D = new Array(11);
+
+var ZSumL = new Array(11);
+var ZSumL2 = new Array(11);
+var Kd = new Array(11);
+Kd[0] = new Array(8);
+Kd[1] = new Array(8);
+Kd[2] = new Array(8);
+Kd[3] = new Array(8);
+Kd[4] = new Array(8);
+Kd[5] = new Array(8);
+Kd[6] = new Array(8);
+Kd[7] = new Array(8);
+Kd[8] = new Array(8);
+Kd[9] = new Array(8);
+Kd[10] = new Array(8);
+Kd[11] = new Array(8);
+
+var VaC = new Array(11); //valences
+var VaM = new Array(8);
+var Hconc; //true hydrogen concentration
+
+var cmcomplex1 = new Array(11); //chelator-metal complexes
+cmcomplex1[0] = new Array(8);
+cmcomplex1[1] = new Array(8);
+cmcomplex1[2] = new Array(8);
+cmcomplex1[3] = new Array(8);
+cmcomplex1[4] = new Array(8);
+cmcomplex1[5] = new Array(8);
+cmcomplex1[6] = new Array(8);
+cmcomplex1[7] = new Array(8);
+cmcomplex1[8] = new Array(8);
+cmcomplex1[9] = new Array(8);
+cmcomplex1[10] = new Array(8);
+cmcomplex1[11] = new Array(8);
+
+var cmcomplex2 = new Array(11);
+cmcomplex2[0] = new Array(8);
+cmcomplex2[1] = new Array(8);
+cmcomplex2[2] = new Array(8);
+cmcomplex2[3] = new Array(8);
+cmcomplex2[4] = new Array(8);
+cmcomplex2[5] = new Array(8);
+cmcomplex2[6] = new Array(8);
+cmcomplex2[7] = new Array(8);
+cmcomplex2[8] = new Array(8);
+cmcomplex2[9] = new Array(8);
+cmcomplex2[10] = new Array(8);
+cmcomplex2[11] = new Array(8);
+
+var IC = new Array(11);
+IC[0] = new Array(4);
+IC[1] = new Array(4);
+IC[2] = new Array(4);
+IC[3] = new Array(4);
+IC[4] = new Array(4);
+IC[5] = new Array(4);
+IC[6] = new Array(4);
+IC[7] = new Array(4);
+IC[8] = new Array(4);
+IC[9] = new Array(4);
+IC[10] = new Array(4);
+IC[11] = new Array(4);
+
+var KML = new Array(11);
+KML[0] = new Array(8);
+KML[1] = new Array(8);
+KML[2] = new Array(8);
+KML[3] = new Array(8);
+KML[4] = new Array(8);
+KML[5] = new Array(8);
+KML[6] = new Array(8);
+KML[7] = new Array(8);
+KML[8] = new Array(8);
+KML[9] = new Array(8);
+KML[10] = new Array(8);
+KML[11] = new Array(8);
+var KHML = new Array(11);
+KHML[0] = new Array(8);
+KHML[1] = new Array(8);
+KHML[2] = new Array(8);
+KHML[3] = new Array(8);
+KHML[4] = new Array(8);
+KHML[5] = new Array(8);
+KHML[6] = new Array(8);
+KHML[7] = new Array(8);
+KHML[8] = new Array(8);
+KHML[9] = new Array(8);
+KHML[10] = new Array(8);
+KHML[11] = new Array(8);
+
+var wht /* temporary variable for trouble shooting */
+
+function conadjust(){  /* adjusts constants for temp. and ionic strength */
+var e,A,Ap,Lf,Lfp,t,i,K
+ t = temperature; i = ionic;
+ e = 87.7251 - 0.3974762*20 + 8.253E-4*20*20;
+ A = 1.8246E6 / Math.exp(1.5*Math.log(e*(20+273.16)));
+ Lf = A*(((Math.exp(0.5*Math.log(0.1))/(1+Math.exp(0.5*Math.log(0.1)))-(0.25*0.1))));
+ e = 87.7251 - 0.3974762*t + 8.253E-4*t*t;
+ Ap = 1.8246E6 / Math.exp(1.5*Math.log(e*(t+273.16)));
+ Lfp = Ap*(((Math.exp(0.5*Math.log(i))/(1+Math.exp(0.5*Math.log(i)))-(0.25*i))));
+
+
+for (x = 0; x < 12; x++){
+//first the hydrogen constants...
+if (VaC[x] > 0){ 
+K = h1[x]+ (2*VaC[x]*1)*(Lf-Lfp);
+h1[x] =  K + dh1[x]*((1/(20+273))-(1/(t+273)))/0.00457652;
+}
+if (VaC[x] > 1){
+K = h2[x]+ (2*(VaC[x]-1)*1)*(Lf-Lfp);
+h2[x] =  K + dh2[x]*((1/(20+273))-(1/(t+273)))/0.00457652;
+}
+if (VaC[x] > 2){
+K = h3[x]+ (2*(VaC[x]-2)*1)*(Lf-Lfp);
+h3[x] =  K + dh3[x]*((1/(20+273))-(1/(t+273)))/0.00457652;
+}
+if (VaC[x] > 3){
+K = h4[x]+ (2*(VaC[x]-3)*1)*(Lf-Lfp);
+h4[x] =  K + dh4[x]*((1/(20+273))-(1/(t+273)))/0.00457652;
+}
+if (h1[x] < 0) { h1[x] = 0;}
+if (h2[x] < 0) { h2[x] = 0;}
+if (h3[x] < 0) { h3[x] = 0;}
+if (h4[x] < 0) { h4[x] = 0;}
+//now the metal chelator constants...
+for (y = 0; y < 9; y++){
+if (VaC[x] > 0){K = mc[y][x]+ (2*VaC[x]*VaM[y])*(Lf-Lfp);
+mc[y][x] =  K + dmc[y][x]*((1/(20+273))-(1/(t+273)))/0.00457652;}
+if (mc[y][x] < 0){mc[y][x] = 0;}
+
+if (VaC[x] > 1){K = mhc[y][x]+ (2*(VaC[x]-1)*VaM[y])*(Lf-Lfp);
+mhc[y][x] =  K + dmhc[y][x]*((1/(20+273))-(1/(t+273)))/0.00457652;}
+if (mhc[y][x] < 0){mhc[y][x] = 0;}
+}
+}
+}
+
+function calcH(){  /* calculates the hydrogen ion concentration */
+var B,TH
+
+B = 0.522932*Math.exp(0.0327016*temperature)+4.015942
+TH = 0.145045*Math.exp(-B*ionic)+0.063546*Math.exp(-43.97704*ionic)+0.695634
+Hconc = (Math.exp((-pH)*Math.LN10))/TH
+}
+
+
+function getvalences(){
+for (i = 0; i < 9; i++){
+VaM[i] = parseInt(metalnames[i].substring(2,3));
+}
+
+for (i = 0; i < 12; i++){
+VaC[i] = 0;
+}
+
+for (i = 0; i < 12; i++){
+ if (h1[i] != 0){
+  VaC[i] = 1;
+ }
+ if (h2[i] != 0){
+  VaC[i] = 2;
+ }
+ if (h3[i] != 0){
+  VaC[i] = 3;
+ }
+ if (h4[i] != 0){
+  VaC[i] = 4;
+ }
+}
+}
+
+
+function getcnames(){
+var num;
+var comma = mcd[7].indexOf(",");
+chelatornames[0] = mcd[7].substring(1,comma);
+var i = 0;
+for (i = 1; i < 12; i++){
+num = (i*10)+7;
+comma = mcd[num].indexOf(",");
+chelatornames[i] = mcd[num].substring(1,comma);
+}
+}
+
+function getmnames(){
+var num;
+for (i = 0; i < 9; i++){
+num = i+8;
+metalnames[i] = mcd[num].substring(1,4);
+}
+}
+
+function getconavail(){
+var q,r,s,t,u,v;
+var i,j,numi,numj,x,y;
+for (i = 0; i < 12; i++){
+ numi = (i*10)+8;
+ t = "";
+ for (j = 0; j < 9; j++){
+  numj = numi+j;
+  v = mcd[numj].substring(9,16);
+  x = parseFloat(v);
+  r = mcd[numj].substring(18,25);
+  y = parseFloat(r);
+  if (x == 0){
+   u = "  ";
+   }
+   else{
+   if (y == 0){
+    u = "A ";
+    }
+    else{
+    u = "T ";
+    }
+   }
+  s = t;
+  t = s+u;
+  }
+ conavailable[i] = t.substring(0, t.length-1)+"|";
+}
+}
+
+
+function loadthearray(){
+var s,t,v;
+var i,num;
+t = "        |";
+for (i = 0; i < 9; i++){
+ s = t;
+ v = metalnames[i].substring(0,1)+"|";
+ t = s+v;
+ }
+s = t + "\n";
+t = s + "        |";
+for (i = 0; i < 9; i++){
+ s = t;
+ v = metalnames[i].substring(1,2)+"|";
+ t = s+v;
+ }
+s = t + "\n";
+t = s + "________|";
+for (i = 0; i < 9; i++){
+ s = t;
+ v = metalnames[i].substring(2,3)+"|";
+ t = s+v;
+ }
+for (i = 0; i < 12; i++){
+ s = t + "\n";
+ v = chelatornames[i];
+ t = s+v+" |"+conavailable[i];
+ }
+s = t;
+t = s+"\n"+"---------------------------";
+document.WMXC2.thearray.value = t;
+document.WMXC2.CH1.value = chelatornames[0];
+document.WMXC2.CH2.value = chelatornames[1];
+document.WMXC2.CH3.value = chelatornames[2];
+document.WMXC2.CH4.value = chelatornames[3];
+document.WMXC2.CH5.value = chelatornames[4];
+document.WMXC2.CH6.value = chelatornames[5];
+document.WMXC2.CH7.value = chelatornames[6];
+document.WMXC2.CH8.value = chelatornames[7];
+document.WMXC2.CH9.value = chelatornames[8];
+document.WMXC2.CH10.value = chelatornames[9];
+document.WMXC2.CH11.value = chelatornames[10];
+document.WMXC2.CH12.value = chelatornames[11];
+document.WMXC2.MT1.value = metalnames[0];
+document.WMXC2.MT2.value = metalnames[1];
+document.WMXC2.MT3.value = metalnames[2];
+document.WMXC2.MT4.value = metalnames[3];
+document.WMXC2.MT5.value = metalnames[4];
+document.WMXC2.MT6.value = metalnames[5];
+document.WMXC2.MT7.value = metalnames[6];
+document.WMXC2.MT8.value = metalnames[7];
+document.WMXC2.MT9.value = metalnames[8];
+
+}
+
+function getconstants(){
+var i, j, num, numj;
+var s;
+
+//hyrdogen constants for the chelators
+for (i = 0; i < 12; i++){
+ num = (i*10)+7;
+ s = mcd[num].substring(9,18);
+ h1[i] = parseFloat(s);
+ s = mcd[num].substring(18,27);
+ h2[i] = parseFloat(s);
+ s = mcd[num].substring(27,36);
+ h3[i] = parseFloat(s);
+ s = mcd[num].substring(36,45);
+ h4[i] = parseFloat(s);
+
+//delta-hydrogen constants for the chelators
+
+ s = mcd[num].substring(45,54);
+ dh1[i] = parseFloat(s);
+ s = mcd[num].substring(55,63);
+ dh2[i] = parseFloat(s);
+ s = mcd[num].substring(63,72);
+ dh3[i] = parseFloat(s);
+ s = mcd[num].substring(72,81);
+ dh4[i] = parseFloat(s);
+ }
+
+for (i = 0; i < 12; i++){
+ num = (i*10)+8;
+ for (j = 0; j < 9; j++){
+  numj = num+j;
+  s = mcd[numj].substring(5,13);
+  mc[j][i] = parseFloat(s);  //metal#, chelator#
+  s = mcd[numj].substring(14,22);
+  mhc[j][i] = parseFloat(s);
+  s = mcd[numj].substring(23,31);
+  dmc[j][i] = parseFloat(s);
+  s = mcd[numj].substring(32,42);
+  dmhc[j][i] = parseFloat(s);
+  }
+ }
+
+
+}
+
+function makekon(){  /* converts constants from exponential to real */
+var Tcon1, Tcon2, Tcon3, Tcon4, Tcon5, Tcon6
+
+for (x = 0; x < 12; x++){
+Tcon1 = Math.exp(h1[x] * Math.LN10);
+Tcon2 = Math.exp(h2[x] * Math.LN10);
+Tcon3 = Math.exp(h3[x] * Math.LN10);
+Tcon4 = Math.exp(h4[x] * Math.LN10);
+
+
+IC[x][0] = 0; IC[x][1] = 0; IC[x][2] = 0; IC[x][3] = 0; IC[x][4] = 0;
+
+IC[x][0] = 1/(1 + Hconc*Tcon1 + Hconc*Hconc*Tcon1*Tcon2 + Hconc*Hconc*Hconc*Tcon1*Tcon2*Tcon3 + Hconc*Hconc*Hconc*Hconc*Tcon1*Tcon2*Tcon3*Tcon4);
+
+if (h1[x] != 0){
+IC[x][1] = 1/((1/(Hconc*Tcon1))+1+Hconc*Tcon2+Hconc*Hconc*Tcon2*Tcon3+Hconc*Hconc*Hconc*Tcon2*Tcon3*Tcon4);
+}
+
+if ((h1[x] != 0) && (h2[x] != 0)){
+IC[x][2] = 1/((1/(Hconc*Hconc*Tcon1*Tcon2))+(1/(Hconc*Tcon2))+1+Hconc*Tcon3+Hconc*Hconc*Tcon3*Tcon4);
+}
+
+if ((h1[x] != 0) && (h2[x] != 0) && (h3[x] != 0)){
+IC[x][3] = 1/((1/(Hconc*Hconc*Hconc*Tcon1*Tcon2*Tcon3))+(1/(Hconc*Hconc*Tcon2*Tcon3))+(1/(Hconc*Tcon3))+1+Hconc*Tcon4)
+}
+
+if ((h1[x] != 0) && (h2[x] != 0) && (h3[x] != 0) && (h4[x] != 0)){
+IC[x][4] = 1/((1/(Hconc*Hconc*Hconc*Hconc*Tcon1*Tcon2*Tcon3*Tcon4))+(1/(Hconc*Hconc*Hconc*Tcon2*Tcon3*Tcon4))+(1/(Hconc*Hconc*Tcon3*Tcon4))+(1/(Hconc*Tcon4))+1);
+}
+
+if (Tcon1 != 0){
+ ZSumL2[x] = 1/(Tcon1*Hconc)+1+Tcon2*Hconc+Tcon2*Tcon3*Hconc*Hconc+Tcon2*Tcon3*Tcon4*Hconc*Hconc*Hconc}else{ZSumL2[x] = 0;}
+
+Tcon1 = Tcon1 * Hconc;
+Tcon2 = Tcon2 * Tcon1 * Hconc;
+Tcon3 = Tcon3 * Tcon2 * Hconc;
+Tcon4 = Tcon4 * Tcon3 * Hconc;
+
+ZSumL[x] = 1 + Tcon1 + Tcon2 + Tcon3 + Tcon4;
+
+
+for (y = 0; y < 9; y++){
+Tcon5 = Math.exp(mc[y][x] * Math.LN10);
+Tcon6 = Math.exp(mhc[y][x] * Math.LN10);
+
+Tcon6 = Tcon6 * Tcon1;
+ZMC[y][x] = Tcon5 + Tcon6;
+cmcomplex1[y][x] = Tcon6; //first part of calculating the chelator-metal complex
+cmcomplex2[y][x] = Tcon5;
+}
+}
+
+}
+
+function makekd(){
+
+for (x = 0; x < 12; x++){
+ for (y = 0; y < 9; y++){
+ KML[y][x] = 0;
+ KHML[y][x] = 0;
+ Kd[y][x] = 0;
+ }
+}
+
+for (x = 0; x < 12; x++){
+ if (totalchelatoramount[x] > 0){
+  for (y = 0; y < 9; y++){
+   if (totalmetalamount[y] > 0){
+    if ((ZSumL[x] != 0) && (mc[y][x] != 0)){
+     KML[y][x] = Math.exp(mc[y][x]*Math.LN10)/ZSumL[x];
+    }
+    if ((ZSumL2[x] != 0) && (mhc[y][x] != 0)){
+     KHML[y][x] = Math.exp(mhc[y][x]*Math.LN10)/ZSumL2[x];
+    }
+    if ((KML[y][x] + KHML[y][x]) != 0){
+     Kd[y][x] = 1/(KML[y][x]+KHML[y][x]);}
+   }
+  }
+ }
+}
+
+}
+
+
+function setup(){
+getcnames();
+getmnames();
+getconavail();
+loadthearray();
+tftoggle();
+getconstants();
+getvalences();
+document.WMXC2.answer.value = "setup complete";
+}
+
+function tftoggle(){
+if (document.WMXC2.TYPECALC[0].checked){
+document.WMXC2.TF.value = "TOTAL";
+}else{
+document.WMXC2.TF.value = "FREE";
+}
+}
+
+function collectvalues(){
+var i;
+pH = parseFloat(document.WMXC2.PH.value);
+temperature = parseFloat(document.WMXC2.TM.value);
+ionic = parseFloat(document.WMXC2.IO.value);
+totalchelatoramount[0] = parseFloat(document.WMXC2.AC1.value);
+totalchelatoramount[1] = parseFloat(document.WMXC2.AC2.value);
+totalchelatoramount[2] = parseFloat(document.WMXC2.AC3.value);
+totalchelatoramount[3] = parseFloat(document.WMXC2.AC4.value);
+totalchelatoramount[4] = parseFloat(document.WMXC2.AC5.value);
+totalchelatoramount[5] = parseFloat(document.WMXC2.AC6.value);
+totalchelatoramount[6] = parseFloat(document.WMXC2.AC7.value);
+totalchelatoramount[7] = parseFloat(document.WMXC2.AC8.value);
+totalchelatoramount[8] = parseFloat(document.WMXC2.AC9.value);
+totalchelatoramount[9] = parseFloat(document.WMXC2.AC10.value);
+totalchelatoramount[10] = parseFloat(document.WMXC2.AC11.value);
+totalchelatoramount[11] = parseFloat(document.WMXC2.AC12.value);
+for (i = 0; i < 9; i++){
+ freechelatoramount[i] = 0;
+ }
+
+if (document.WMXC2.TYPECALC[0].checked){
+ totalmetalamount[0] = parseFloat(document.WMXC2.AM1.value);
+ totalmetalamount[1] = parseFloat(document.WMXC2.AM2.value);
+ totalmetalamount[2] = parseFloat(document.WMXC2.AM3.value);
+ totalmetalamount[3] = parseFloat(document.WMXC2.AM4.value);
+ totalmetalamount[4] = parseFloat(document.WMXC2.AM5.value);
+ totalmetalamount[5] = parseFloat(document.WMXC2.AM6.value);
+ totalmetalamount[6] = parseFloat(document.WMXC2.AM7.value);
+ totalmetalamount[7] = parseFloat(document.WMXC2.AM8.value);
+ totalmetalamount[8] = parseFloat(document.WMXC2.AM9.value);
+ for (i = 0; i < 9; i++){
+  freemetalamount[i] = 0;
+  }
+ }else{
+ freemetalamount[0] = parseFloat(document.WMXC2.AM1.value);
+ freemetalamount[1] = parseFloat(document.WMXC2.AM2.value);
+ freemetalamount[2] = parseFloat(document.WMXC2.AM3.value);
+ freemetalamount[3] = parseFloat(document.WMXC2.AM4.value);
+ freemetalamount[4] = parseFloat(document.WMXC2.AM5.value);
+ freemetalamount[5] = parseFloat(document.WMXC2.AM6.value);
+ freemetalamount[6] = parseFloat(document.WMXC2.AM7.value);
+ freemetalamount[7] = parseFloat(document.WMXC2.AM8.value);
+ freemetalamount[8] = parseFloat(document.WMXC2.AM9.value);
+ for (i = 0; i < 9; i++){
+  totalmetalamount[i] = 0;
+  }
+ }
+}
+
+
+function docalcfree(){
+var n,o;
+var m = new Array(8);
+var c = new Array(11);
+
+document.WMXC2.answer.value = "Calculating...";
+// initial guesses 
+for (x = 0; x < 9; x++){
+freemetalamount[x] = totalmetalamount[x]/2;
+if (totalmetalamount[x] > 0){m[x] = 0;} else {m[x] = 1;}
+}
+for (x = 0; x < 12; x++){
+freechelatoramount[x] = totalchelatoramount[x]/ZSumL[x];
+if (totalchelatoramount[x] > 0){c[x] = 0;} else {c[x] = 1;}
+}
+for (w = 0; w < 1000; w++){
+if ((m[0] == 0) || (m[1] == 0) || (m[3] == 0) || (m[4] == 0) || (m[5] == 0) || (m[6] == 0) || (m[7] == 0) || (m[8] == 0) || (c[0] == 0) || (c[1] == 0) || (c[2] == 0) || (c[3] == 0) || (c[4] == 0) || (c[5] == 0) || (c[6] == 0) || (c[7] == 0) || (c[8] == 0) || (c[9] == 0) || (c[10] == 0) || (c[11] == 0)){
+
+for (x = 0; x < 12; x++){
+if (c[x] == 0){
+o = 0;
+for (y = 0; y < 9; y++){
+o = o + (ZMC[y][x]*freemetalamount[y]/ZSumL[x]);
+}
+n = totalchelatoramount[x]/(1 + o);
+if (Math.abs(n-freechelatoramount[x]) < 0.0001*freechelatoramount[x]){
+c[x] = 1;
+}
+freechelatoramount[x] = n;
+}
+}
+
+for (x = 0; x < 9; x++){
+if (m[x] == 0){
+o = 0;
+for (y = 0; y < 12; y++){
+o = o + (ZMC[x][y]*freechelatoramount[y]/ZSumL[y]);
+}
+n = totalmetalamount[x]/(1 + o);
+if (Math.abs(n-freemetalamount[x]) < 0.0001*freemetalamount[x]){
+m[x] = 1;
+}
+freemetalamount[x] = n;
+}
+}
+
+}
+}
+
+for (x = 0; x < 12; x++){
+D[x] = ZSumL[x];
+for (y = 0; y < 9; y++){
+D[x] = D[x]+(ZMC[y][x]*freemetalamount[y]);
+}
+if (totalchelatoramount[x] == 0){
+D[x] = 1;
+}
+}
+}
+
+function docalctotal(){
+var s;
+
+document.WMXC2.answer.value = "Calculating...";
+
+for (x = 0; x < 12; x++){
+D[x] = ZSumL[x];
+for (y = 0; y < 9; y++){
+D[x] = D[x]+(ZMC[y][x]*freemetalamount[y]);
+}
+if (totalchelatoramount[x] == 0){
+D[x] = 1;
+}
+if (totalchelatoramount[x] == 0){freechelatoramount[x] = 0} else {
+s = 0;
+for (y = 0; y < 9; y++){
+s = s + ZMC[y][x]*freemetalamount[y]/ZSumL[x];
+}
+freechelatoramount[x] = totalchelatoramount[x]/(1 + s);
+}
+}
+
+for (y = 0; y < 9; y++){
+totalmetalamount[y] = freemetalamount[y];
+for (x = 0; x < 12; x++){
+totalmetalamount[y] = totalmetalamount[y] + (ZMC[y][x]*freemetalamount[y]*(totalchelatoramount[x]/D[x]));
+}
+}
+}
+
+function calcioniccontrib(){
+var CIL,CIM,T,M1,M2,QC,QM,VC,VM,VD,VE,VF,VG;
+for (x = 0; x < 12; x++){
+ for (y = 0; y < 9; y++){
+ cmcomplex1[y][x] = cmcomplex1[y][x]*freemetalamount[y]*totalchelatoramount[x]/D[x];
+ cmcomplex2[y][x] = cmcomplex2[y][x]*freemetalamount[y]*totalchelatoramount[x]/D[x];
+ }
+}
+ 
+  T = 0;
+  for (a = 0; a < 12; a ++){
+    QC = freechelatoramount[a];
+    VD = VaC[a];
+    VE = 0; VF = 0; VG = 0;
+    if (VD > 1){VE = VD-1;}
+    if (VE > 1){VF = VE-1;}
+    if (VF > 1){VG = VF-1;}    //free chelator ionic + counter ionic
+    T = T + (IC[a][0]*QC)*2*VD + (IC[a][1]*QC)*2*VE + (IC[a][2]*QC)*2*VF + (IC[a][3]*QC)*2*VG;
+   }
+  for (a = 0; a < 9; a ++){
+    T = T + 2*freemetalamount[a]*VaM[a];
+   }
+  for (a = 0; a < 12; a++){
+    VC = VaC[a];
+    for (b = 0; b < 9; b++){
+       M1 = cmcomplex2[b][a];
+       M2 = cmcomplex1[b][a];
+       VM = VaM[b];
+       VD = Math.abs(VC-VM);
+       VE = Math.abs(VC-VM-1);
+       T = T + 2*M1*VD + 2*M2*VE;
+     }
+   }
+  if (T < 0){T = 0;}
+  ioncont = T/2;
+}
+
+function cleanfloat(s){
+var e,r;
+var t = "";
+t += s;
+e = t.indexOf("e");
+if (e > -1){
+ if (e < 5){r = t;}else{r = t.substring(0,5)+t.substring(e,t.length);}
+} else {
+ if (t.length > 9){
+  r = t.substring(0,9);
+ }else{r = t}
+}
+while (r.length < 9){
+r = r+" ";
+}
+return r;
+}
+
+
+function docalc(){
+var s,t; //putting together the final output
+var i,j;
+var S10;
+collectvalues();
+getconstants();
+conadjust();
+calcH();
+makekon();
+
+if (document.WMXC2.TYPECALC[0].checked){
+docalcfree();
+s = "";
+for (i = 0; i < 9; i++){
+if (totalmetalamount[i] > 0){
+s = s + metalnames[i] + "      " + cleanfloat(freemetalamount[i]) + "  "+cleanfloat(totalmetalamount[i]) + "\n";
+}
+}
+}else{
+docalctotal();
+s = "";
+for (i = 0; i < 9; i++){
+if (freemetalamount[i] > 0){
+s = s + metalnames[i] + "      " + cleanfloat(freemetalamount[i]) + "  "+cleanfloat(totalmetalamount[i]) + "\n";
+}
+}
+};
+calcioniccontrib();
+t = "";
+for (i = 0; i < 12; i++){
+if (totalchelatoramount[i] > 0){
+t = t + chelatornames[i] + "  " + cleanfloat(freechelatoramount[i]) + "  " + cleanfloat(totalchelatoramount[i]) + "\n";
+}
+}
+
+s = "pH = "+pH+"   "+temperature+" C   "+ionic+" N   " + "Ionic contribution [ABS] "+cleanfloat(ioncont)+" N \n \n" + "Name     Free       Total \n"+s+t;
+
+makekd();
+
+s = s+"\nLow and High define acceptable range of 'good' buffering \nComplex       Kd          Low Limit   High Limit \n";
+S10 = Math.sqrt(10);
+for (x = 0; x < 12; x++){
+ if (totalchelatoramount[x] > 0){
+  for (y = 0; y < 9; y++){
+   if (totalmetalamount[y] > 0){
+   s = s + metalnames[y]+"-"+chelatornames[x]+"   "+cleanfloat(Kd[y][x]) + "   "+cleanfloat(Kd[y][x]/S10) + "   "+ cleanfloat(Kd[y][x]*S10)+"\n";
+   }
+  }
+ }
+}
+
+document.WMXC2.answer.value = s;
+}
+
+</script>
+</head>
+<body link="#0000ff" vlink="#800080" bgcolor="#f5f7de" onload="setup()">
+
+<h1>WEBMAXC STANDARD</h1>
+<p>12/31/03 [CMC1203.TCM] [<a href="http://web.stanford.edu/~cpatton/constants.htm">constants</a>] see also <a href="http://web.stanford.edu/~cpatton/webmaxcE.htm">WEBMAXC 
+  EXTENDED</a> for more metals</p>
+<h3>INTRODUCTION</h3>
+<p><b>WARNING: limited error checking in this version. Be careful how you enter 
+  information.. </b></p>
+<p>This page should work with ANY machine that has a Javascript enabled browser. Now Mac and UNIX/LINUX users can start to have access to the power of MAXC without need of an emulator. I have tried to keep this page as "browser neutral" as possible. As you can read the source to this page, please feel free to offer suggestions for improvement. [OPEN SOURCE!]. You may also save this page to your computer and use offline with your browser.</p>
+<p>Please feel free to edit and re-use this page as you see fit.<br>
+  If you post on a web site, I would appreciate a link back to the MaxChelator 
+  home page: http://www.stanford.edu/~cpatton/maxc.html</p>
+<hr>
+<h3>PROGRAM</h3>
+<p>1) Choose a calculation type: </p>
+<form name="WMXC2">
+<table border="" cellspacing="1" cellpadding="7" width="220">
+<tbody><tr><td valign="TOP" bgcolor="#ffffff">
+<input type="radio" name="TYPECALC" value="F" checked="TRUE" onclick="tftoggle()">
+        &nbsp;FIND FREE METAL(S) <br>
+        <input type="radio" name="TYPECALC" value="T" onclick="tftoggle()">
+        &nbsp;FIND TOTAL METAL(S)</td>
+</tr>
+</tbody></table>
+
+<p>2) Choose temperature in degrees C (0-50), pH (4-10) and ionic strength (empirical ionic equivalents. 0.001-1.000, seawater = 0.5 and ringers = 0.16):</p>
+<table border="" cellspacing="1" cellpadding="7" width="375">
+<tbody><tr><td valign="TOP" bgcolor="#ffffff">
+Temperature = <input type="text" name="TM" value="20" size="5" maxlength="5">
+pH = <input type="text" name="PH" value="7.0" size="5" maxlength="5">
+Ionic = <input type="text" name="IO" value="0.1" size="5" maxlength="5"></td>
+</tr>
+</tbody></table>
+
+<p>3) <u>You must have all cross constants for a calculation to work.</u><br>
+NOTE: Nothing prevents the program from running with unavailable constants, but the results will not be valid!</p>
+<p>"A" means constants are available. "T" means temperature compensation is also available.  <br>Enter values to the left of the chelator and metals names you want. All values are in <b>MOLAR</b>. You may use scientific notation, i.e. 1E-3 for 0.001M. </p>
+  <table border="" cellspacing="1" cellpadding="7" width="600">
+    <tbody><tr>
+      <td valign="TOP" bgcolor="#ffffff" width="202"> THE ARRAY: [do not edit]<br>
+<textarea name="thearray" rows="16" cols="28"></textarea></td>
+      <td valign="TOP" bgcolor="#ffffff" width="166"> 
+        <p><b><u>CHELATORS</u></b><br>
+<input type="text" name="CH1" size="7" maxlength="7"><input type="text" name="AC1" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH2" size="7" maxlength="7"><input type="text" name="AC2" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH3" size="7" maxlength="7"><input type="text" name="AC3" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH4" size="7" maxlength="7"><input type="text" name="AC4" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH5" size="7" maxlength="7"><input type="text" name="AC5" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH6" size="7" maxlength="7"><input type="text" name="AC6" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH7" size="7" maxlength="7"><input type="text" name="AC7" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH8" size="7" maxlength="7"><input type="text" name="AC8" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH9" size="7" maxlength="7"><input type="text" name="AC9" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH10" size="7" maxlength="7"><input type="text" name="AC10" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH11" size="7" maxlength="7"><input type="text" name="AC11" size="10" maxlength="10" value="0"><br>
+<input type="text" name="CH12" size="7" maxlength="7"><input type="text" name="AC12" size="10" maxlength="10" value="0"><br>
+</p></td>
+      <td valign="TOP" bgcolor="#ffffff" width="148"> 
+        <p><b><u>METALS</u></b> <input type="text" name="TF" size="5" maxlength="5" value="TOTAL"><br>
+<input type="text" name="MT1" size="3" maxlength="3"><input type="text" name="AM1" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT2" size="3" maxlength="3"><input type="text" name="AM2" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT3" size="3" maxlength="3"><input type="text" name="AM3" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT4" size="3" maxlength="3"><input type="text" name="AM4" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT5" size="3" maxlength="3"><input type="text" name="AM5" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT6" size="3" maxlength="3"><input type="text" name="AM6" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT7" size="3" maxlength="3"><input type="text" name="AM7" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT8" size="3" maxlength="3"><input type="text" name="AM8" size="10" maxlength="10" value="0"><br>
+<input type="text" name="MT9" size="3" maxlength="3"><input type="text" name="AM9" size="10" maxlength="10" value="0"><br>
+Do not edit chelator or metal names</p></td>
+</tr>
+</tbody></table>
+
+<p>4) Press CALCULATE to produce answer below: NOTE: you may cut and paste all or parts of the answer to another application.</p>
+<input type="button" value="Calculate" name="processit" onclick="docalc()"> Gives free and total metals &amp; chelators, Kds, complexes, ionic contribution<br>
+<textarea name="answer" rows="10" cols="80"></textarea>
+</form>
+<p><b>NOTE:</b> You can "evaluate chelators" by having a non-zero value for any chelators you wish to evalute [like 1e-6] and at least one metal &gt; zero. Kd's and ranges will appear at end [you may have to scroll down]. Only valid for metal-chelator combinations where there are constants.</p>
+<p><a href="http://web.stanford.edu/~cpatton/maxc.html">HOME</a> - <a href="http://www.stanford.edu/~cpatton/maxc.html">MAXCHELATOR</a> 
+</p>
+
+
+</body></html>

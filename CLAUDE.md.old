@@ -1,0 +1,47 @@
+# Project: Cation-Ligand Equilibrium Engine (Win32 C++)
+
+## Scientific Goal
+Calculate free vs. total concentrations for divalent cations (Ca2+, Mg2+, Ba2+, Cd2+, Sr2+, Mn2+, X) in complexing solutions.
+
+## Technical Constraints
+- **Target:** Native Windows 11 GUI (Win32 API).
+- **Core Math:** Iterative solver providing upper/lower bounds (avoiding "initial guess" dependency).
+- **Two-Way Solver:** - Input Total -> Calculate Free.
+    - Input Free -> Calculate Total.
+- **Ligand Management:** Support for EGTA, EDTA, BAPTA, ATP, ADP, AMP, Citrate, Aspartate, Glutamate, Glycinate, Gluconate.
+- **Physical Corrections:** Temperature (ºC), Ionic Strength (mM), and pH.
+
+## Scientific Constraints
+- **Methodology:** Use the Newton-Raphson iterative method for mass balance equations.
+- **Chemistry:** Account for pH (protonation), ionic strength (Davies or Debye-Hückel), and temperature corrections.
+- **Precision:** Use `double` or `long double` for all concentration matrices.
+- **Code Generation:** Document the algorithms used in the legacy code before translating them to modern C++
+
+## Directory and File Logic
+1. **Architecture:** Keep headers in `/include` and implementation in `/src`.
+2. **Ligand data:** Data and structures for `Ligands` (LogK, Enthalpy, Valence, etc.) are in `ligands.cvs`. 
+3. **Readme:** Helpful readme document in 'README.md'. 
+4. **Legacy data:**  Reference for JavaScript (WebMaxC) and metadata constants in `legacy_code/`:.
+
+## Build Commands
+- **Full Build:** `./build.sh`
+- **Clean:** `rm -rf build/*`
+
+## Project Rules
+1. **UI Style:** Use native Win32 API calls; avoid heavy external GUI frameworks for now.
+2. **Compilation:** Always use `-static` and `-mwindows` flags for the final `.exe`.
+3. **Error Handling:** If `build.sh` fails, read `build_errors.log` and self-correct. Update `build.sh` as needed. 
+
+## Environment Context
+- **Primary GPU:** NVIDIA RTX 4090 (Local) - Use for heavy coding and logic.
+- **Secondary GPU:** NVIDIA RTX 4070 (Basement: 192.168.12.115) - Use for documentation lookups.
+- **Compiler:** x86_64-w64-mingw32-g++ (Cross-compiling for Windows).
+- **User Background:** Scientific Researcher. Use technical, precise language.
+
+## Verification Protocols
+- **Source Cross-Referencing:** Before finalizing any binding constants (LogK) or Enthalpy values (ΔH) in `include/constants.h`, the agent MUST:
+    1. Extract the values from the `legacy_code/`.
+    2. Use the `web-search` tool to find the most recent IUPAC or peer-reviewed values for that specific Cation-Ligand pair.
+    3. Compare the legacy value with the modern value.
+    4. If a significant discrepancy exists (>0.05 LogK units), document the difference in `docs/CONSTANTS_LOG.md` and prioritize the modern value unless the legacy code uses a specific correction model that requires the original constant.
+- **Search Scope:** Prioritize results from NIST (Critical Stability Constants), IUPAC databases, and recent publications in "Analytical Chemistry" or "Journal of Solution Chemistry."
