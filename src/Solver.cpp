@@ -126,20 +126,44 @@ double CationSystem::calculateTemperatureCorrection(double temperature, double d
 
 // Calculate adjusted stability constant considering pH and ionic strength
 double CationSystem::calculateStabilityConstant(double logK, double pH, double ionicStrength) {
+    if (logK <= 0.0) return 0.0;
+
     // Convert logK to K
-    double K = std::pow(10, logK);
+    double K = std::pow(10.0, logK);
 
-    // Apply pH correction (simplified - for 1:1 complex formation)
-    double pHCorrection = 1.0; // For 1:1 complexes, pH correction is minimal
+    // pH correction is assumed via protonation fraction of ligand-specific behaviour
+    double pHCorrection = 1.0;
+    double ionicCorrection = calculateIonicStrengthCorrection(ionicStrength, 2.0);
 
-    // Apply ionic strength correction
-    double ionicCorrection = 1.0; // Simplified - would be more complex in real implementation
-
-    // Combined correction
     double adjustedK = K * pHCorrection * ionicCorrection;
-
-    // Return log of adjusted K
+    if (adjustedK <= 0.0) return 0.0;
     return std::log10(adjustedK);
+}
+
+// Calculate adjusted stability constant for a specific ligand-metal pair
+// using pH, ionic strength, and temperature corrections.
+double CationSystem::calculateStabilityConstant(const Ligand* ligand, const std::string& metalName) {
+    if (!ligand) return 0.0;
+
+    double logK = getMetalBindingConstant(ligand, metalName);
+    if (logK <= 0.0) return 0.0;
+
+    double K = std::pow(10.0, logK);
+    double deltaH = getMetalEnthalpyConstant(ligand, metalName);
+
+    double tempCorr = calculateTemperatureCorrection(params.temperature, deltaH);
+    double ionicCorr = calculateIonicStrengthCorrection(params.ionicStrength, 2.0);
+
+    double pHalpha = calculateProtonationFraction(params.pH, ligand);
+
+    // Effective formation constant incorporates ligand protonation, temperature, and ionic strength
+    double effectiveK = K * tempCorr * ionicCorr * pHalpha;
+    if (effectiveK < 1e-300) {
+        // Underflow protection
+        effectiveK = 0.0;
+    }
+
+    return effectiveK > 0.0 ? std::log10(effectiveK) : 0.0;
 }
 
 // Helper method to get metal-specific binding constant
@@ -178,6 +202,17 @@ double CationSystem::getMetalEnthalpyConstant(const Ligand* ligand, const std::s
     
     // If metal not found, return 0 (no enthalpy correction)
     return 0.0;
+}
+
+// Multispecies helper: calculate complex for 1:1 metal ion at fixed free ligand
+// From Ci = Ki * Mi_free * L_free and Mi_free = Mi_total - Ci:
+// Ci = (Ki * L_free * Mi_total) / (1 + Ki * L_free)
+double CationSystem::calculateComplexFromLigandFree(double totalMetal, double K, double freeLigand) {
+    if (K <= 0.0 || totalMetal <= 0.0 || freeLigand <= 0.0) {
+        return 0.0;
+    }
+    double part = K * freeLigand;
+    return totalMetal * part / (1.0 + part);
 }
 
 // Iterative bounding solver for 1:1 complex formation
@@ -236,20 +271,13 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double f
         return result;
     }
 
-    // Get metal-specific binding constant (logK for metal-ligand complex)
-    double logK_metal = getMetalBindingConstant(ligand, metalName);
-    if (logK_metal == 0.0) {
-        // If no specific binding constant, calculation not possible
+    // Get adjusted, corrected binding constant for metal-ligand complex
+    double logK_metal = calculateStabilityConstant(ligand, metalName);
+    if (logK_metal <= 0.0) {
         return result;
     }
-    
-    // Convert logK to actual formation constant K with corrections applied
-    // For FREE-to-TOTAL: input is already in the free (deprotonated) form
-    // So we only apply ionic strength and temperature corrections
-    
-    // Convert corrected logK to actual formation constant K
-    // TEMPORARILY DISABLED: All corrections disabled to debug
-    double complexFormationConstant = std::pow(10, logK_metal);
+
+    double complexFormationConstant = std::pow(10.0, logK_metal);
 
     // Calculate complex concentration using iterative method with actual K value
     double complex = solveForFreeMetal(freeMetal, freeLigand, complexFormationConstant, 1e-10, 1000);
@@ -286,21 +314,12 @@ EquilibriumResult CationSystem::calculateTotalToFree(double totalLigand, double 
         return result;
     }
 
-    // Get metal-specific binding constant (logK for metal-ligand complex)
-    double logK_metal = getMetalBindingConstant(ligand, metalName);
-    if (logK_metal == 0.0) {
-        // If no specific binding constant, calculation not possible
+    double logK_metal = calculateStabilityConstant(ligand, metalName);
+    if (logK_metal <= 0.0) {
         return result;
     }
-    
-    // Convert logK to actual formation constant K with corrections applied
-    // For TOTAL-to-FREE: input includes all protonation states
-    // So we apply ionic strength and temperature corrections
-    // NOTE: Protonation correction temporarily disabled pending pH model refinement
-    
-    // Convert corrected logK to actual formation constant K
-    // TEMPORARILY DISABLED: All corrections disabled to debug
-    double complexFormationConstant = std::pow(10, logK_metal);
+
+    double complexFormationConstant = std::pow(10.0, logK_metal);
 
     // Calculate complex concentration using iterative method with actual K value
     double complex = solveForFreeMetal(totalMetal, totalLigand, complexFormationConstant, 1e-10, 1000);
@@ -317,6 +336,131 @@ EquilibriumResult CationSystem::calculateTotalToFree(double totalLigand, double 
     result.ionicStrength = params.ionicStrength;
     result.pH = params.pH;
 
+    return result;
+}
+
+// Multi-metal equilibrium: Total-to-Free (7-cation matrix solver)
+EquilibriumMultiResult CationSystem::CalculateTotalToFreeMulti(double totalLigand,
+                                                    const std::vector<double>& totalMetals,
+                                                    const std::string& ligandName,
+                                                    const std::vector<std::string>& metalNames) {
+    EquilibriumMultiResult result;
+    result.totalLigand = totalLigand;
+    result.ionicStrength = params.ionicStrength;
+    result.pH = params.pH;
+    result.metalNames = metalNames;
+    result.totalMetals = totalMetals;
+
+    if (metalNames.size() != totalMetals.size() || metalNames.empty() || totalLigand <= 0) {
+        return result;
+    }
+
+    const Ligand* ligand = GetLigandByName(ligandName);
+    if (!ligand) {
+        return result;
+    }
+
+    size_t n = metalNames.size();
+    std::vector<double> Kvalues(n, 0.0);
+    for (size_t i = 0; i < n; ++i) {
+        double logK = calculateStabilityConstant(ligand, metalNames[i]);
+        Kvalues[i] = (logK > 0.0) ? std::pow(10.0, logK) : 0.0;
+    }
+
+    // Solve for free ligand using bisection on f(L_free) = totalLigand - L_free - sum_i C_i(L_free)
+    auto f = [&](double Lfree) {
+        double sumComplex = 0.0;
+        for (size_t i = 0; i < n; ++i) {
+            sumComplex += calculateComplexFromLigandFree(totalMetals[i], Kvalues[i], Lfree);
+        }
+        return totalLigand - Lfree - sumComplex;
+    };
+
+    double lower = 0.0;
+    double upper = totalLigand;
+    double f_lower = f(lower);
+    double f_upper = f(upper);
+
+    // If at upper bound it is still positive, all ligand is free and no complex forms
+    if (f_upper > 0.0) {
+        result.freeLigand = totalLigand;
+        result.freeMetals = totalMetals;
+        result.complex.assign(n, 0.0);
+        return result;
+    }
+
+    double mid = 0.0;
+    for (int iter = 0; iter < 200; ++iter) {
+        mid = (lower + upper) / 2.0;
+        double f_mid = f(mid);
+
+        if (std::abs(f_mid) < 1e-12) {
+            break;
+        }
+
+        if (f_mid > 0) {
+            lower = mid;
+        } else {
+            upper = mid;
+        }
+    }
+
+    double Lfree = mid;
+    result.freeLigand = Lfree;
+    result.complex.resize(n);
+    result.freeMetals.resize(n);
+
+    for (size_t i = 0; i < n; ++i) {
+        result.complex[i] = calculateComplexFromLigandFree(totalMetals[i], Kvalues[i], Lfree);
+        result.freeMetals[i] = totalMetals[i] - result.complex[i];
+    }
+
+    return result;
+}
+
+// Multi-metal equilibrium: Free-to-Total
+EquilibriumMultiResult CationSystem::CalculateFreeToTotalMulti(double freeLigand,
+                                                    const std::vector<double>& freeMetals,
+                                                    const std::string& ligandName,
+                                                    const std::vector<std::string>& metalNames) {
+    EquilibriumMultiResult result;
+    result.freeLigand = freeLigand;
+    result.ionicStrength = params.ionicStrength;
+    result.pH = params.pH;
+    result.metalNames = metalNames;
+    result.freeMetals = freeMetals;
+
+    if (metalNames.size() != freeMetals.size() || metalNames.empty() || freeLigand < 0) {
+        return result;
+    }
+
+    const Ligand* ligand = GetLigandByName(ligandName);
+    if (!ligand) {
+        return result;
+    }
+
+    size_t n = metalNames.size();
+    result.totalMetals.resize(n);
+    result.complex.resize(n);
+
+    double Lfree = freeLigand;
+    double sumComplex = 0.0;
+
+    for (size_t i = 0; i < n; ++i) {
+        double logK = calculateStabilityConstant(ligand, metalNames[i]);
+        double K = (logK > 0.0) ? std::pow(10.0, logK) : 0.0;
+
+        if (K <= 0.0 || freeMetals[i] < 0.0) {
+            result.complex[i] = 0.0;
+            result.totalMetals[i] = freeMetals[i];
+        } else {
+            result.complex[i] = calculateComplexFromLigandFree(freeMetals[i], K, Lfree);
+            result.totalMetals[i] = freeMetals[i] + result.complex[i];
+        }
+        sumComplex += result.complex[i];
+    }
+
+    result.totalLigand = freeLigand + sumComplex;
     return result;
 }
 

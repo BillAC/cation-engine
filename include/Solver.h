@@ -20,6 +20,20 @@ struct EquilibriumResult {
                          totalLigand(0), totalMetal(0), ionicStrength(0), pH(0) {}
 };
 
+// Result struct for multi-metal equilibrium calculations
+struct EquilibriumMultiResult {
+    double freeLigand;
+    double totalLigand;
+    std::vector<std::string> metalNames;
+    std::vector<double> freeMetals;
+    std::vector<double> totalMetals;
+    std::vector<double> complex;
+    double ionicStrength;
+    double pH;
+
+    EquilibriumMultiResult() : freeLigand(0), totalLigand(0), ionicStrength(0), pH(0) {}
+};
+
 // Structure to hold system parameters
 struct SystemParameters {
     double temperature;      // Temperature in Celsius
@@ -49,6 +63,7 @@ private:
     double calculateIonicStrengthCorrection(double ionicStrength, double charge);
     double calculateTemperatureCorrection(double temperature, double deltaH);
     double calculateStabilityConstant(double logK, double pH, double ionicStrength);
+    double calculateStabilityConstant(const Ligand* ligand, const std::string& metalName);
     
     // Get metal-specific binding constant for a ligand-metal pair
     double getMetalBindingConstant(const Ligand* ligand, const std::string& metalName);
@@ -59,6 +74,9 @@ private:
     // Iterative bounding solver for 1:1 complex formation
     double solveForFreeMetal(double totalMetal, double totalLigand, double complexFormationConstant,
                            double tolerance = 1e-10, int maxIterations = 1000);
+
+    // Helper for multispecies 1:1 complex formation, given free ligand
+    double calculateComplexFromLigandFree(double totalMetal, double K, double freeLigand);
 
     // Two-way calculation methods
     EquilibriumResult calculateFreeToTotal(double freeLigand, double freeMetal,
@@ -88,6 +106,17 @@ public:
     // Calculate equilibrium concentrations (Total-to-Free)
     EquilibriumResult CalculateTotalToFree(double totalLigand, double totalMetal,
                                          const std::string& ligandName, const std::string& metalName);
+
+    // Multi-metal equilibrium (7-cation matrix solver)
+    EquilibriumMultiResult CalculateTotalToFreeMulti(double totalLigand,
+                                                    const std::vector<double>& totalMetals,
+                                                    const std::string& ligandName,
+                                                    const std::vector<std::string>& metalNames);
+
+    EquilibriumMultiResult CalculateFreeToTotalMulti(double freeLigand,
+                                                    const std::vector<double>& freeMetals,
+                                                    const std::string& ligandName,
+                                                    const std::vector<std::string>& metalNames);
 
     // Calculate equilibrium concentrations (both directions)
     EquilibriumResult CalculateEquilibrium(double totalLigand, double totalMetal,
