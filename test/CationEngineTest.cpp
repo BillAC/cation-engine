@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cassert>
 
-int main() {
+void test_CationEngineTest() {
     std::cout << "Testing CationEngine implementation..." << std::endl;
 
     // Create engine instance
@@ -25,10 +25,10 @@ int main() {
     // Test getting stability constants for EDTA
     auto stability = engine.GetStabilityConstants("EDTA");
     std::cout << "EDTA stability constants:" << std::endl;
-    std::cout << "  H1: " << stability.H1 << std::endl;
-    std::cout << "  H2: " << stability.H2 << std::endl;
-    std::cout << "  H3: " << stability.H3 << std::endl;
-    std::cout << "  H4: " << stability.H4 << std::endl;
+    std::cout << "  log_K1: " << stability.log_K1 << std::endl;
+    std::cout << "  log_K2: " << stability.log_K2 << std::endl;
+    std::cout << "  log_K3: " << stability.log_K3 << std::endl;
+    std::cout << "  log_K4: " << stability.log_K4 << std::endl;
 
     // Test getting metal properties
     auto metalProps = engine.GetMetalProperties("Ca2");
@@ -37,5 +37,4 @@ int main() {
     std::cout << "  Atomic weight: " << metalProps.atomicWeight << std::endl;
 
     std::cout << "CationEngine test completed successfully!" << std::endl;
-    return 0;
 }

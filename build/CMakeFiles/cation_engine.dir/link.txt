@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcation_engine.a CMakeFiles/cation_engine.dir/src/LigandData.cpp.o CMakeFiles/cation_engine.dir/src/LigandCSVLoader.cpp.o CMakeFiles/cation_engine.dir/src/CationEngine.cpp.o CMakeFiles/cation_engine.dir/src/Solver.cpp.o
-/usr/bin/ranlib libcation_engine.a

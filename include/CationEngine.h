@@ -1,73 +1,21 @@
 #ifndef CATION_ENGINE_H
 #define CATION_ENGINE_H
 
-#include "Ligand.h"
-#include <vector>
-#include <string>
-#include <map>
+// DEPRECATION NOTICE:
+// This header is deprecated. CationEngine has been unified with CationSystem.
+// All functionality is now available through the CationSystem class in Solver.h.
+//
+// Migration path:
+//   Old: #include "CationEngine.h"     CationEngine engine;
+//   New: #include "Solver.h"            CationSystem engine;
+//
+// The CationSystem class provides all features from both CationEngine and the
+// original CationSystem, including system parameters, iterative solving,
+// physiological corrections, and two-way calculations.
 
-// Structure to hold equilibrium concentrations
-struct EquilibriumConcentrations {
-    double ligand;      // Free ligand concentration
-    double metal;       // Free metal concentration
-    double complex;     // Complex concentration
-    double total;       // Total concentration
-};
+#include "Solver.h"
 
-// Main cation-ligand equilibrium engine
-class CationEngine {
-private:
-    // Internal data structures
-    std::vector<Ligand> ligands;
-    std::vector<Metal> metals;
-
-    // Equilibrium constants for different metal-ligand combinations
-    std::map<std::string, double> equilibriumConstants;
-
-public:
-    // Constructor
-    CationEngine();
-
-    // Destructor
-    ~CationEngine();
-
-    // Initialize with specific ligands and metals
-    void Initialize(const std::vector<std::string>& ligandNames,
-                   const std::vector<std::string>& metalNames);
-
-    // Calculate equilibrium concentrations
-    EquilibriumConcentrations CalculateEquilibrium(double totalLigand,
-                                                   double totalMetal,
-                                                   double pH,
-                                                   const std::string& ligandName,
-                                                   const std::string& metalName);
-
-    // Get stability constants for a ligand
-    StabilityConstants GetStabilityConstants(const std::string& ligandName);
-
-    // Get metal properties
-    Metal GetMetalProperties(const std::string& metalName);
-
-    // Set equilibrium constants (for custom calculations)
-    void SetEquilibriumConstant(const std::string& key, double constant);
-
-    // Get equilibrium constant
-    double GetEquilibriumConstant(const std::string& key);
-
-    // Add ligand to the system
-    void AddLigand(const Ligand& ligand);
-
-    // Add metal to the system
-    void AddMetal(const Metal& metal);
-
-    // Clear all data
-    void Clear();
-
-    // Get list of available ligands
-    std::vector<std::string> GetAvailableLigands() const;
-
-    // Get list of available metals
-    std::vector<std::string> GetAvailableMetals() const;
-};
+// Compatibility alias (deprecated - use CationSystem directly)
+using CationEngine = CationSystem;
 
 #endif // CATION_ENGINE_H

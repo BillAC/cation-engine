@@ -39,10 +39,13 @@ private:
     std::map<std::string, double> adjustedConstants;
 
     // Helper functions
-    double calculateProtonationFraction(double pH, double logK);
+    double calculateProtonationFraction(double pH, double logK); // Single step (deprecated)
+    double calculateProtonationFraction(double pH, const Ligand* ligand); // Multi-step (new)
     double calculateIonicStrengthCorrection(double ionicStrength, double charge);
     double calculateTemperatureCorrection(double temperature, double deltaH);
     double calculateStabilityConstant(double logK, double pH, double ionicStrength);
+    double getMetalBindingConstant(const Ligand* ligand, const std::string& metalName);
+    double getMetalEnthalpyConstant(const Ligand* ligand, const std::string& metalName);
     double solveForFreeMetal(double totalMetal, double totalLigand, double complexFormationConstant,
                             double tolerance = 1e-12, int maxIterations = 1000);
 
@@ -81,6 +84,18 @@ public:
     std::vector<std::string> GetAvailableLigands() const;
     std::vector<std::string> GetAvailableMetals() const;
     double GetAdjustedEquilibriumConstant(const std::string& ligandName, const std::string& metalName);
+
+    // Get stability constants for a ligand (from unified API)
+    StabilityConstants GetStabilityConstants(const std::string& ligandName) const;
+
+    // Get metal properties (from unified API)
+    Metal GetMetalProperties(const std::string& metalName) const;
+
+    // Set equilibrium constants (from unified API)
+    void SetEquilibriumConstant(const std::string& key, double constant);
+
+    // Get equilibrium constant (from unified API)
+    double GetEquilibriumConstant(const std::string& key) const;
 };
 
 #endif // SOLVER_H

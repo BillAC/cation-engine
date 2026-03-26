@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/mnt/programming/cation-engine/include
 
-CXX_FLAGS = -std=gnu++17 -Wall -Wextra
+CXX_FLAGS = -std=gnu++17
 

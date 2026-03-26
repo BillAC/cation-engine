@@ -148,7 +148,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=CationEngine
+CMAKE_PROJECT_NAME:STATIC=cation_engine
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -216,13 +216,13 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
-CationEngine_BINARY_DIR:STATIC=/mnt/programming/cation-engine/build
+cation_engine_BINARY_DIR:STATIC=/mnt/programming/cation-engine/build
 
 //Value Computed by CMake
-CationEngine_IS_TOP_LEVEL:STATIC=ON
+cation_engine_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-CationEngine_SOURCE_DIR:STATIC=/mnt/programming/cation-engine
+cation_engine_SOURCE_DIR:STATIC=/mnt/programming/cation-engine
 
 
 ########################

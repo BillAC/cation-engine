@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cassert>
 
-int main() {
+void test_SolverTest() {
     std::cout << "Testing Solver implementation..." << std::endl;
 
     // Create solver instance
@@ -57,5 +57,4 @@ int main() {
     std::cout << "Ionic strength: " << result2.ionicStrength << " mM" << std::endl;
 
     std::cout << "Solver test completed successfully!" << std::endl;
-    return 0;
 }

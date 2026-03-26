@@ -8,10 +8,22 @@ int main() {
     std::cout << "=====================================" << std::endl;
 
     // Initialize ligand data from CSV
-    LoadLigandDataFromCSV("ligands.csv");
+    InitializeLigandData();
 
     // Create solver instance
     CationSystem solver;
+
+    // Add all available ligands to the system
+    auto allLigands = GetAllLigands();
+    for (const auto& ligand : allLigands) {
+        solver.AddLigand(ligand);
+    }
+
+    // Add all available metals to the system
+    auto allMetals = GetAllMetals();
+    for (const auto& metal : allMetals) {
+        solver.AddMetal(metal);
+    }
 
     // Set system parameters
     SystemParameters params;

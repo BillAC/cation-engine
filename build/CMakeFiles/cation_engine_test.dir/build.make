@@ -72,10 +72,94 @@ include CMakeFiles/cation_engine_test.dir/flags.make
 CMakeFiles/cation_engine_test.dir/codegen:
 .PHONY : CMakeFiles/cation_engine_test.dir/codegen
 
+CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o: /mnt/programming/cation-engine/src/Constants.cpp
+CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o -MF CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o.d -o CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o -c /mnt/programming/cation-engine/src/Constants.cpp
+
+CMakeFiles/cation_engine_test.dir/src/Constants.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/src/Constants.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/src/Constants.cpp > CMakeFiles/cation_engine_test.dir/src/Constants.cpp.i
+
+CMakeFiles/cation_engine_test.dir/src/Constants.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/src/Constants.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/src/Constants.cpp -o CMakeFiles/cation_engine_test.dir/src/Constants.cpp.s
+
+CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o: /mnt/programming/cation-engine/src/LigandCSVLoader.cpp
+CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o -MF CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o.d -o CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o -c /mnt/programming/cation-engine/src/LigandCSVLoader.cpp
+
+CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/src/LigandCSVLoader.cpp > CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.i
+
+CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/src/LigandCSVLoader.cpp -o CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.s
+
+CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o: /mnt/programming/cation-engine/src/LigandData.cpp
+CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o -MF CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o.d -o CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o -c /mnt/programming/cation-engine/src/LigandData.cpp
+
+CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/src/LigandData.cpp > CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.i
+
+CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/src/LigandData.cpp -o CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.s
+
+CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o: /mnt/programming/cation-engine/src/Solver.cpp
+CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o -MF CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o.d -o CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o -c /mnt/programming/cation-engine/src/Solver.cpp
+
+CMakeFiles/cation_engine_test.dir/src/Solver.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/src/Solver.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/src/Solver.cpp > CMakeFiles/cation_engine_test.dir/src/Solver.cpp.i
+
+CMakeFiles/cation_engine_test.dir/src/Solver.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/src/Solver.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/src/Solver.cpp -o CMakeFiles/cation_engine_test.dir/src/Solver.cpp.s
+
+CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o: /mnt/programming/cation-engine/test_ligand_loading.cpp
+CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o -MF CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o -c /mnt/programming/cation-engine/test_ligand_loading.cpp
+
+CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/test_ligand_loading.cpp > CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.i
+
+CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test_ligand_loading.cpp -o CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.s
+
+CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o: /mnt/programming/cation-engine/test/CationEngineTest.cpp
+CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o -MF CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o -c /mnt/programming/cation-engine/test/CationEngineTest.cpp
+
+CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/test/CationEngineTest.cpp > CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.i
+
+CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test/CationEngineTest.cpp -o CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.s
+
 CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
 CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o: /mnt/programming/cation-engine/test/SolverTest.cpp
 CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o -MF CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o -c /mnt/programming/cation-engine/test/SolverTest.cpp
 
 CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.i: cmake_force
@@ -86,23 +170,82 @@ CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test/SolverTest.cpp -o CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.s
 
+CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o: /mnt/programming/cation-engine/test/validation_suite.cpp
+CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o -MF CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o -c /mnt/programming/cation-engine/test/validation_suite.cpp
+
+CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/test/validation_suite.cpp > CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.i
+
+CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test/validation_suite.cpp -o CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.s
+
+CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o: /mnt/programming/cation-engine/test/ReferenceSolverTest.cpp
+CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o -MF CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o -c /mnt/programming/cation-engine/test/ReferenceSolverTest.cpp
+
+CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/test/ReferenceSolverTest.cpp > CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.i
+
+CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test/ReferenceSolverTest.cpp -o CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.s
+
+CMakeFiles/cation_engine_test.dir/test_runner.cpp.o: CMakeFiles/cation_engine_test.dir/flags.make
+CMakeFiles/cation_engine_test.dir/test_runner.cpp.o: /mnt/programming/cation-engine/test_runner.cpp
+CMakeFiles/cation_engine_test.dir/test_runner.cpp.o: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/cation_engine_test.dir/test_runner.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cation_engine_test.dir/test_runner.cpp.o -MF CMakeFiles/cation_engine_test.dir/test_runner.cpp.o.d -o CMakeFiles/cation_engine_test.dir/test_runner.cpp.o -c /mnt/programming/cation-engine/test_runner.cpp
+
+CMakeFiles/cation_engine_test.dir/test_runner.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cation_engine_test.dir/test_runner.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/programming/cation-engine/test_runner.cpp > CMakeFiles/cation_engine_test.dir/test_runner.cpp.i
+
+CMakeFiles/cation_engine_test.dir/test_runner.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cation_engine_test.dir/test_runner.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/programming/cation-engine/test_runner.cpp -o CMakeFiles/cation_engine_test.dir/test_runner.cpp.s
+
 # Object files for target cation_engine_test
 cation_engine_test_OBJECTS = \
-"CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o"
+"CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o" \
+"CMakeFiles/cation_engine_test.dir/test_runner.cpp.o"
 
 # External object files for target cation_engine_test
 cation_engine_test_EXTERNAL_OBJECTS =
 
-cation_engine_test: CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o
-cation_engine_test: CMakeFiles/cation_engine_test.dir/build.make
-cation_engine_test: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
-cation_engine_test: libcation_engine.a
-cation_engine_test: CMakeFiles/cation_engine_test.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable cation_engine_test"
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/test_runner.cpp.o
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/build.make
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/compiler_depend.ts
+bin/cation_engine_test: CMakeFiles/cation_engine_test.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/mnt/programming/cation-engine/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable bin/cation_engine_test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/cation_engine_test.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/cation_engine_test.dir/build: cation_engine_test
+CMakeFiles/cation_engine_test.dir/build: bin/cation_engine_test
 .PHONY : CMakeFiles/cation_engine_test.dir/build
 
 CMakeFiles/cation_engine_test.dir/clean:

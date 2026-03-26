@@ -1,0 +1,20 @@
+CXX = x86_64-w64-mingw32-g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+INCLUDES = -Iinclude
+SOURCES = src/LigandCSVLoader.cpp src/CationEngine.cpp src/Solver.cpp src/LigandData.cpp
+OBJECTS = $(SOURCES:.cpp=.o)
+EXECUTABLE = cation_engine.exe
+LDFLAGS = -static-libgcc -static-libstdc++ -static -lpthread -luser32 -lgdi32 -lcomctl32 -lcomdlg32
+
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): main.cpp $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $< $(OBJECTS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
+
+clean:
+	rm -f $(OBJECTS) $(EXECUTABLE)
+
+.PHONY: all clean

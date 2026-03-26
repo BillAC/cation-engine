@@ -1,18 +1,14 @@
 #include "CationEngine.h"
+#include "LigandCSVLoader.h"
 #include <cmath>
 #include <algorithm>
 #include <iostream>
 
 // Constructor
 CationEngine::CationEngine() {
-    // Initialize with default ligands and metals
-    for (const auto& ligand : LIGANDS) {
-        ligands.push_back(ligand);
-    }
-
-    for (const auto& metal : METALS) {
-        metals.push_back(metal);
-    }
+    // Initialize with empty ligands and metals - data will be loaded from CSV
+    // Ligands and metals will be populated when Initialize() is called or when
+    // ligand data is loaded from CSV
 }
 
 // Destructor
@@ -63,14 +59,14 @@ EquilibriumConcentrations CationEngine::CalculateEquilibrium(double totalLigand,
     // For now, we'll provide a basic framework
 
     // Calculate protonation fractions (simplified - using log_K1 instead of H1)
-    double alpha1 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K1 - pH));
-    double alpha2 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K2 - pH));
-    double alpha3 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K3 - pH));
-    double alpha4 = 1.0 / (1.0 + std::pow(10, ligand->stability_constants.log_K4 - pH));
+    double alpha1 = 1.0 / (1.0 + std::pow(10, ligand->constants.log_K1 - pH));
+    double alpha2 = 1.0 / (1.0 + std::pow(10, ligand->constants.log_K2 - pH));
+    double alpha3 = 1.0 / (1.0 + std::pow(10, ligand->constants.log_K3 - pH));
+    double alpha4 = 1.0 / (1.0 + std::pow(10, ligand->constants.log_K4 - pH));
 
     // For a simple 1:1 complex formation (this is a simplification)
     // In reality, this would involve solving a system of equations
-    double complexFormationConstant = std::pow(10, ligand->stability_constants.log_K1); // Simplified
+    double complexFormationConstant = std::pow(10, ligand->constants.log_K1); // Simplified
 
     // Basic equilibrium calculation
     double freeLigand = totalLigand * alpha1;  // Simplified
@@ -94,7 +90,7 @@ EquilibriumConcentrations CationEngine::CalculateEquilibrium(double totalLigand,
 StabilityConstants CationEngine::GetStabilityConstants(const std::string& ligandName) {
     const Ligand* ligand = GetLigandByName(ligandName);
     if (ligand) {
-        return ligand->stability_constants;
+        return ligand->constants;
     }
     return StabilityConstants();
 }

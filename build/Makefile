@@ -117,17 +117,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named cation_engine
+# Target rules for targets named cation_engine_main
 
 # Build rule for target.
-cation_engine: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cation_engine
-.PHONY : cation_engine
+cation_engine_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cation_engine_main
+.PHONY : cation_engine_main
 
 # fast build rule for target.
-cation_engine/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/build
-.PHONY : cation_engine/fast
+cation_engine_main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/build
+.PHONY : cation_engine_main/fast
 
 #=============================================================================
 # Target rules for targets named cation_engine_test
@@ -141,19 +141,6 @@ cation_engine_test: cmake_check_build_system
 cation_engine_test/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/build
 .PHONY : cation_engine_test/fast
-
-#=============================================================================
-# Target rules for targets named cation_engine_main
-
-# Build rule for target.
-cation_engine_main: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cation_engine_main
-.PHONY : cation_engine_main
-
-# fast build rule for target.
-cation_engine_main/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/build
-.PHONY : cation_engine_main/fast
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -179,36 +166,40 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-src/CationEngine.o: src/CationEngine.cpp.o
-.PHONY : src/CationEngine.o
+src/Constants.o: src/Constants.cpp.o
+.PHONY : src/Constants.o
 
 # target to build an object file
-src/CationEngine.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/CationEngine.cpp.o
-.PHONY : src/CationEngine.cpp.o
+src/Constants.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Constants.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Constants.cpp.o
+.PHONY : src/Constants.cpp.o
 
-src/CationEngine.i: src/CationEngine.cpp.i
-.PHONY : src/CationEngine.i
+src/Constants.i: src/Constants.cpp.i
+.PHONY : src/Constants.i
 
 # target to preprocess a source file
-src/CationEngine.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/CationEngine.cpp.i
-.PHONY : src/CationEngine.cpp.i
+src/Constants.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Constants.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Constants.cpp.i
+.PHONY : src/Constants.cpp.i
 
-src/CationEngine.s: src/CationEngine.cpp.s
-.PHONY : src/CationEngine.s
+src/Constants.s: src/Constants.cpp.s
+.PHONY : src/Constants.s
 
 # target to generate assembly for a file
-src/CationEngine.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/CationEngine.cpp.s
-.PHONY : src/CationEngine.cpp.s
+src/Constants.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Constants.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Constants.cpp.s
+.PHONY : src/Constants.cpp.s
 
 src/LigandCSVLoader.o: src/LigandCSVLoader.cpp.o
 .PHONY : src/LigandCSVLoader.o
 
 # target to build an object file
 src/LigandCSVLoader.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandCSVLoader.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandCSVLoader.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.o
 .PHONY : src/LigandCSVLoader.cpp.o
 
 src/LigandCSVLoader.i: src/LigandCSVLoader.cpp.i
@@ -216,7 +207,8 @@ src/LigandCSVLoader.i: src/LigandCSVLoader.cpp.i
 
 # target to preprocess a source file
 src/LigandCSVLoader.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandCSVLoader.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandCSVLoader.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.i
 .PHONY : src/LigandCSVLoader.cpp.i
 
 src/LigandCSVLoader.s: src/LigandCSVLoader.cpp.s
@@ -224,7 +216,8 @@ src/LigandCSVLoader.s: src/LigandCSVLoader.cpp.s
 
 # target to generate assembly for a file
 src/LigandCSVLoader.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandCSVLoader.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandCSVLoader.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandCSVLoader.cpp.s
 .PHONY : src/LigandCSVLoader.cpp.s
 
 src/LigandData.o: src/LigandData.cpp.o
@@ -232,7 +225,8 @@ src/LigandData.o: src/LigandData.cpp.o
 
 # target to build an object file
 src/LigandData.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandData.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandData.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.o
 .PHONY : src/LigandData.cpp.o
 
 src/LigandData.i: src/LigandData.cpp.i
@@ -240,7 +234,8 @@ src/LigandData.i: src/LigandData.cpp.i
 
 # target to preprocess a source file
 src/LigandData.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandData.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandData.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.i
 .PHONY : src/LigandData.cpp.i
 
 src/LigandData.s: src/LigandData.cpp.s
@@ -248,7 +243,8 @@ src/LigandData.s: src/LigandData.cpp.s
 
 # target to generate assembly for a file
 src/LigandData.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/LigandData.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/LigandData.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/LigandData.cpp.s
 .PHONY : src/LigandData.cpp.s
 
 src/Solver.o: src/Solver.cpp.o
@@ -256,7 +252,8 @@ src/Solver.o: src/Solver.cpp.o
 
 # target to build an object file
 src/Solver.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/Solver.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Solver.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o
 .PHONY : src/Solver.cpp.o
 
 src/Solver.i: src/Solver.cpp.i
@@ -264,7 +261,8 @@ src/Solver.i: src/Solver.cpp.i
 
 # target to preprocess a source file
 src/Solver.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/Solver.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Solver.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Solver.cpp.i
 .PHONY : src/Solver.cpp.i
 
 src/Solver.s: src/Solver.cpp.s
@@ -272,8 +270,57 @@ src/Solver.s: src/Solver.cpp.s
 
 # target to generate assembly for a file
 src/Solver.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine.dir/build.make CMakeFiles/cation_engine.dir/src/Solver.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_main.dir/build.make CMakeFiles/cation_engine_main.dir/src/Solver.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/src/Solver.cpp.s
 .PHONY : src/Solver.cpp.s
+
+test/CationEngineTest.o: test/CationEngineTest.cpp.o
+.PHONY : test/CationEngineTest.o
+
+# target to build an object file
+test/CationEngineTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.o
+.PHONY : test/CationEngineTest.cpp.o
+
+test/CationEngineTest.i: test/CationEngineTest.cpp.i
+.PHONY : test/CationEngineTest.i
+
+# target to preprocess a source file
+test/CationEngineTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.i
+.PHONY : test/CationEngineTest.cpp.i
+
+test/CationEngineTest.s: test/CationEngineTest.cpp.s
+.PHONY : test/CationEngineTest.s
+
+# target to generate assembly for a file
+test/CationEngineTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/CationEngineTest.cpp.s
+.PHONY : test/CationEngineTest.cpp.s
+
+test/ReferenceSolverTest.o: test/ReferenceSolverTest.cpp.o
+.PHONY : test/ReferenceSolverTest.o
+
+# target to build an object file
+test/ReferenceSolverTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.o
+.PHONY : test/ReferenceSolverTest.cpp.o
+
+test/ReferenceSolverTest.i: test/ReferenceSolverTest.cpp.i
+.PHONY : test/ReferenceSolverTest.i
+
+# target to preprocess a source file
+test/ReferenceSolverTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.i
+.PHONY : test/ReferenceSolverTest.cpp.i
+
+test/ReferenceSolverTest.s: test/ReferenceSolverTest.cpp.s
+.PHONY : test/ReferenceSolverTest.s
+
+# target to generate assembly for a file
+test/ReferenceSolverTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/ReferenceSolverTest.cpp.s
+.PHONY : test/ReferenceSolverTest.cpp.s
 
 test/SolverTest.o: test/SolverTest.cpp.o
 .PHONY : test/SolverTest.o
@@ -299,6 +346,78 @@ test/SolverTest.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/SolverTest.cpp.s
 .PHONY : test/SolverTest.cpp.s
 
+test/validation_suite.o: test/validation_suite.cpp.o
+.PHONY : test/validation_suite.o
+
+# target to build an object file
+test/validation_suite.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.o
+.PHONY : test/validation_suite.cpp.o
+
+test/validation_suite.i: test/validation_suite.cpp.i
+.PHONY : test/validation_suite.i
+
+# target to preprocess a source file
+test/validation_suite.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.i
+.PHONY : test/validation_suite.cpp.i
+
+test/validation_suite.s: test/validation_suite.cpp.s
+.PHONY : test/validation_suite.s
+
+# target to generate assembly for a file
+test/validation_suite.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test/validation_suite.cpp.s
+.PHONY : test/validation_suite.cpp.s
+
+test_ligand_loading.o: test_ligand_loading.cpp.o
+.PHONY : test_ligand_loading.o
+
+# target to build an object file
+test_ligand_loading.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.o
+.PHONY : test_ligand_loading.cpp.o
+
+test_ligand_loading.i: test_ligand_loading.cpp.i
+.PHONY : test_ligand_loading.i
+
+# target to preprocess a source file
+test_ligand_loading.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.i
+.PHONY : test_ligand_loading.cpp.i
+
+test_ligand_loading.s: test_ligand_loading.cpp.s
+.PHONY : test_ligand_loading.s
+
+# target to generate assembly for a file
+test_ligand_loading.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_ligand_loading.cpp.s
+.PHONY : test_ligand_loading.cpp.s
+
+test_runner.o: test_runner.cpp.o
+.PHONY : test_runner.o
+
+# target to build an object file
+test_runner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_runner.cpp.o
+.PHONY : test_runner.cpp.o
+
+test_runner.i: test_runner.cpp.i
+.PHONY : test_runner.i
+
+# target to preprocess a source file
+test_runner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_runner.cpp.i
+.PHONY : test_runner.cpp.i
+
+test_runner.s: test_runner.cpp.s
+.PHONY : test_runner.s
+
+# target to generate assembly for a file
+test_runner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cation_engine_test.dir/build.make CMakeFiles/cation_engine_test.dir/test_runner.cpp.s
+.PHONY : test_runner.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -307,15 +426,14 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... cation_engine"
 	@echo "... cation_engine_main"
 	@echo "... cation_engine_test"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... src/CationEngine.o"
-	@echo "... src/CationEngine.i"
-	@echo "... src/CationEngine.s"
+	@echo "... src/Constants.o"
+	@echo "... src/Constants.i"
+	@echo "... src/Constants.s"
 	@echo "... src/LigandCSVLoader.o"
 	@echo "... src/LigandCSVLoader.i"
 	@echo "... src/LigandCSVLoader.s"
@@ -325,9 +443,24 @@ help:
 	@echo "... src/Solver.o"
 	@echo "... src/Solver.i"
 	@echo "... src/Solver.s"
+	@echo "... test/CationEngineTest.o"
+	@echo "... test/CationEngineTest.i"
+	@echo "... test/CationEngineTest.s"
+	@echo "... test/ReferenceSolverTest.o"
+	@echo "... test/ReferenceSolverTest.i"
+	@echo "... test/ReferenceSolverTest.s"
 	@echo "... test/SolverTest.o"
 	@echo "... test/SolverTest.i"
 	@echo "... test/SolverTest.s"
+	@echo "... test/validation_suite.o"
+	@echo "... test/validation_suite.i"
+	@echo "... test/validation_suite.s"
+	@echo "... test_ligand_loading.o"
+	@echo "... test_ligand_loading.i"
+	@echo "... test_ligand_loading.s"
+	@echo "... test_runner.o"
+	@echo "... test_runner.i"
+	@echo "... test_runner.s"
 .PHONY : help
 
 

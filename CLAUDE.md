@@ -1,7 +1,13 @@
 # Project: Cation-Ligand Equilibrium Engine (Win32 C++)
 
 ## Scientific Goal
-Calculate free vs. total concentrations for divalent cations (Ca2+, Mg2+, Ba2+, Cd2+, Sr2+, Mn2+, X) in complexing solutions using an iterative bounding method.
+Calculate free vs. total concentrations for divalent cations (Ca2+,	Mg2+,	Ba2+,	Cd2+,	Sr2+,	Mn2+,	Cu2+,	Zn2+) in complexing solutions using an iterative bounding method.
+
+### Scientific Implementation Details
+- **Algorithm:** The technique is an iterative one providing upper and lower bounds for unknowns without requiring initial guesses. It must work for concentrations many orders of magnitude apart.
+- **Scope:** Restricted to one cation binding to a given ligand at a time (1:1 stoichiometry per site). Applicable to large molecules with multiple independent "sub-ligands".
+- **Physiological Corrections:** Implement the Van 't Hoff equation for temperature correction and the Davies (or Extended Debye-Hückel) equation for ionic strength correction within `CationSystem::calculateStabilityConstant`.
+- **Protonation:** Ensure the protonation/pH-dependent binding fractions for ligands are calculated using the multi-step protonation constants ($pK_a$ values) from the 'ligands.CSV'.
 
 ## Functional Specification
 - **Core Function:** Compute free ions and ion-ligand complexes for arbitrary numbers of divalent cations and ligands.
@@ -11,8 +17,8 @@ Calculate free vs. total concentrations for divalent cations (Ca2+, Mg2+, Ba2+, 
     - Determine Total required to produce specific Free concentrations.
 
 ## UI Layout (Native Win32)
-- **Ligands Section:** 10 field pairs. Drop-down box (Ligand selection) + Input box (mM concentration). Default: <None>.
-- **Cations Section:** 7 rows (Ca2+, Mg2+, Ba2+, Cd2+, Sr2+, Mn2+, X).
+- **Ligands Section:** 16 field pairs. Ligands are from Column 1 in 'ligands.csv'. Drop-down box (Ligand selection) + Input box (mM concentration). Default: <None>.
+- **Cations Section:** 8 rows (Ca2+,	Mg2+,	Ba2+,	Cd2+,	Sr2+,	Mn2+,	Cu2+,	Zn2).
     - Col 1: "Free Concentration" Input + Drop-down (nM, uM, mM).
     - Col 2: "Total Concentration" Input (mM).
     - Constraint: Radio-style exclusivity (User enters either Free or Total per row).
@@ -31,14 +37,40 @@ Calculate free vs. total concentrations for divalent cations (Ca2+, Mg2+, Ba2+, 
 3. **Documentation:** Analysis reports in `/docs`, build logs in `build_errors.log`.
 
 ## Build & Project Rules
-- **Commands:** `./build.sh` (Full Build), `rm -rf build/*` (Clean).
-- **Compilation:** Use `-static` and `-mwindows` for the final .exe.
-- **Protocol:** If build fails, read `build_errors.log` and self-correct the code or `build.sh`.
+- **Build System:** Standardize on CMake. Always use an out-of-source `build/` directory.
+- **Build Commands:**
+  - Full Build: `cmake -B build && cmake --build build`
+  - Clean: `rm -rf build/*`
+- **Test Commands:**
+  - Run All Tests: `ctest --test-dir build --output-on-failure`
+  - Run Validation: `./build/cation_engine_validation`
+- **Protocol:** If build fails, review `build_errors.log` (if present) or `stderr`. Fix the code or `CMakeLists.txt`.
+
+## Naming Conventions
+- **Classes:** `PascalCase` (e.g., `CationSystem`)
+- **Methods:** `camelCase` (e.g., `calculateStabilityConstant`)
+- **Variables:** `camelCase` (e.g., `freeConcentration`)
+- **Files:** `PascalCase` for headers/source (e.g., `Solver.cpp`)
+- **Constants:** `kPascalCase` or `UPPER_SNAKE_CASE` (e.g., `kBoltzmannConstant`)
+
+## Architectural Guidelines
+1. **Header Locations:** All public headers MUST reside in `include/`. Private implementation headers MAY reside in `src/`.
+2. **Solver Parity:** The current 1:1 solver is a placeholder. Implementation MUST evolve to the "7-cation matrix" simultaneous solver described in the Scientific Goal.
+3. **Redundancy:** Unify `CationEngine` and `CationSystem` to reduce API confusion.
 
 ## Data Governance & CSV Integrity
-1. **Read-Only Constants:** The file `ligands.csv` is the validated scientific "Source of Truth." The agent is **strictly forbidden** from overwriting, "correcting," or modifying this file's contents unless specifically instructed to add a *new* ligand.
-2. **Parser Alignment:** If the solver produces unexpected results, the agent must first verify its own CSV parsing logic (column mapping) before questioning the data in the file.
-3. **Backup Requirement:** If a new ligand is added, the agent MUST create a backup (e.g., `ligands.csv.bak`) before the modification.
+1. **Read-Only Constants:** The file `ligands.csv` is the validated scientific "Source of Truth." The agent is **strictly forbidden** from overwriting, "correcting," or modifying this file's contents unless specifically instructed to add a *new* ligand. 
+2. **DO NOT MODIFY `ligands.csv`:** The file `ligands.csv` is the validated scientific "Source of Truth". You are strictly forbidden from altering, "correcting", or overwriting this file
+3. **Parser Alignment:** If the solver produces unexpected results, the agent must first verify its own CSV parsing logic (column mapping) before questioning the data in the file.
+4. **Backup Requirement:** If a new ligand is added by the user, the agent MUST create a backup (e.g., `ligands.csv.bak`) before the modification.
+
+## Build Instructions (Cross-Compilation)
+- **Toolchain:** x86_64-w64-mingw32-g++ (MinGW-w64)
+- **Standard Build Command:**
+  ```bash
+  x86_64-w64-mingw32-g++ -I./include src/*.cpp -o cation_engine.exe \
+  -static-libgcc -static-libstdc++ -static -lpthread \
+  -luser32 -lgdi32 -lcomctl32 -lcomdlg32
 
 ## Verification Protocols
 - **Data Integrity:** Cross-reference legacy LogK/ΔH values against NIST/IUPAC via web-search.
