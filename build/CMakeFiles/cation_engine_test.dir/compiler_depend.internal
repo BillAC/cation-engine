@@ -545,7 +545,7 @@ CMakeFiles/cation_engine_test.dir/src/Solver.cpp.o
  /mnt/programming/cation-engine/src/Solver.cpp
  /mnt/programming/cation-engine/include/Ligand.h
  /mnt/programming/cation-engine/include/LigandCSVLoader.h
- /mnt/programming/cation-engine/src/Solver.h
+ /mnt/programming/cation-engine/include/Solver.h
  /usr/include/alloca.h
  /usr/include/asm-generic/bitsperlong.h
  /usr/include/asm-generic/errno-base.h

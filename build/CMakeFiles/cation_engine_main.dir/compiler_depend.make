@@ -759,7 +759,7 @@ CMakeFiles/cation_engine_main.dir/src/LigandData.cpp.o: /mnt/programming/cation-
 CMakeFiles/cation_engine_main.dir/src/Solver.cpp.o: /mnt/programming/cation-engine/src/Solver.cpp \
   /mnt/programming/cation-engine/include/Ligand.h \
   /mnt/programming/cation-engine/include/LigandCSVLoader.h \
-  /mnt/programming/cation-engine/src/Solver.h \
+  /mnt/programming/cation-engine/include/Solver.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
@@ -1198,8 +1198,6 @@ CMakeFiles/cation_engine_main.dir/main.cpp.o:
 /usr/include/c++/14/string_view:
 
 /usr/include/c++/14/tr1/poly_laguerre.tcc:
-
-/mnt/programming/cation-engine/src/Solver.h:
 
 /usr/include/c++/14/ext/atomicity.h:
 

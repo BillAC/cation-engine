@@ -90,13 +90,16 @@ double CationSystem::calculateProtonationFraction(double pH, double logK) {
 double CationSystem::calculateIonicStrengthCorrection(double ionicStrength, double charge) {
     if (ionicStrength <= 0) return 1.0;
 
+    // Convert ionic strength from mM to M
+    double I_molar = ionicStrength / 1000.0;
+
     // Davies equation parameters
     const double A = 0.51; // Temperature-dependent parameter (0.51 at 25°C)
-    double sqrtI = std::sqrt(ionicStrength);
+    double sqrtI = std::sqrt(I_molar);
     
     // Davies equation: log(γ) = -A*z²*[√I/(1+√I) - 0.3*I]
     double logGamma = -A * charge * charge * 
-                     (sqrtI / (1.0 + sqrtI) - 0.3 * ionicStrength);
+                     (sqrtI / (1.0 + sqrtI) - 0.3 * I_molar);
     
     // Activity coefficient: γ = 10^(logGamma)
     return std::pow(10, logGamma);
@@ -133,8 +136,16 @@ double CationSystem::calculateStabilityConstant(double logK, double pH, double i
 
     // pH correction is assumed via protonation fraction of ligand-specific behaviour
     double pHCorrection = 1.0;
-    double ionicCorrection = calculateIonicStrengthCorrection(ionicStrength, 2.0);
-
+    
+    // For metal-ligand complex formation, we need activity coefficients for all species
+    // Ca2+ + L4- ⇌ CaL2-
+    double gamma_Ca = calculateIonicStrengthCorrection(ionicStrength, 2.0);      // Ca2+ charge +2
+    double gamma_L = calculateIonicStrengthCorrection(ionicStrength, -4.0);     // L4- charge -4
+    double gamma_complex = calculateIonicStrengthCorrection(ionicStrength, -2.0); // CaL2- charge -2
+    
+    // Conditional K' = K_thermo * gamma_Ca * gamma_L / gamma_complex
+    double ionicCorrection = gamma_Ca * gamma_L / gamma_complex;
+    
     double adjustedK = K * pHCorrection * ionicCorrection;
     if (adjustedK <= 0.0) return 0.0;
     return std::log10(adjustedK);
@@ -152,12 +163,15 @@ double CationSystem::calculateStabilityConstant(const Ligand* ligand, const std:
     double deltaH = getMetalEnthalpyConstant(ligand, metalName);
 
     double tempCorr = calculateTemperatureCorrection(params.temperature, deltaH);
-    double ionicCorr = calculateIonicStrengthCorrection(params.ionicStrength, 2.0);
+    
+    // For now, disable ionic strength correction as the CSV constants appear to be conditional
+    double ionicCorr = 1.0;
 
-    double pHalpha = calculateProtonationFraction(params.pH, ligand);
+    // For metal-ligand binding constants, the logK values in the CSV are already
+    // for the fully deprotonated ligand form, so we don't apply protonation correction
+    // The protonation correction is handled separately in the equilibrium calculations
 
-    // Effective formation constant incorporates ligand protonation, temperature, and ionic strength
-    double effectiveK = K * tempCorr * ionicCorr * pHalpha;
+    double effectiveK = K * tempCorr * ionicCorr;
     if (effectiveK < 1e-300) {
         // Underflow protection
         effectiveK = 0.0;
@@ -271,7 +285,7 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double f
         return result;
     }
 
-    // Get adjusted, corrected binding constant for metal-ligand complex
+    // Get adjusted binding constant for metal-ligand complex
     double logK_metal = calculateStabilityConstant(ligand, metalName);
     if (logK_metal <= 0.0) {
         return result;
@@ -279,8 +293,15 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double f
 
     double complexFormationConstant = std::pow(10.0, logK_metal);
 
-    // Calculate complex concentration using iterative method with actual K value
-    double complex = solveForFreeMetal(freeMetal, freeLigand, complexFormationConstant, 1e-10, 1000);
+    // Calculate protonation fraction for the ligand
+    double alpha = calculateProtonationFraction(params.pH, ligand);
+
+    // The effective binding constant needs to account for ligand protonation
+    // K_effective = K_metal * alpha (where alpha is fraction of fully deprotonated form)
+    double effectiveK = complexFormationConstant * alpha;
+
+    // Calculate complex concentration using iterative method
+    double complex = solveForFreeMetal(freeMetal, freeLigand, effectiveK, 1e-10, 1000);
 
     // Calculate free concentrations
     double freeLigandFinal = freeLigand - complex;
@@ -321,8 +342,14 @@ EquilibriumResult CationSystem::calculateTotalToFree(double totalLigand, double 
 
     double complexFormationConstant = std::pow(10.0, logK_metal);
 
-    // Calculate complex concentration using iterative method with actual K value
-    double complex = solveForFreeMetal(totalMetal, totalLigand, complexFormationConstant, 1e-10, 1000);
+    // Calculate protonation fraction for the ligand
+    double alpha = calculateProtonationFraction(params.pH, ligand);
+
+    // The effective binding constant needs to account for ligand protonation
+    double effectiveK = complexFormationConstant * alpha;
+
+    // Calculate complex concentration using iterative method
+    double complex = solveForFreeMetal(totalMetal, totalLigand, effectiveK, 1e-10, 1000);
 
     // Calculate free concentrations
     double freeLigandFinal = totalLigand - complex;

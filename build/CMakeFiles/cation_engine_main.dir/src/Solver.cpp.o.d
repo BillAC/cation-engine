@@ -1,6 +1,6 @@
 CMakeFiles/cation_engine_main.dir/src/Solver.cpp.o: \
  /mnt/programming/cation-engine/src/Solver.cpp /usr/include/stdc-predef.h \
- /mnt/programming/cation-engine/src/Solver.h \
+ /mnt/programming/cation-engine/include/Solver.h \
  /mnt/programming/cation-engine/include/Ligand.h \
  /usr/include/c++/14/string /usr/include/c++/14/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/14/bits/c++config.h \
@@ -130,7 +130,6 @@ CMakeFiles/cation_engine_main.dir/src/Solver.cpp.o: \
  /usr/include/c++/14/bits/stl_multimap.h \
  /usr/include/c++/14/bits/erase_if.h \
  /mnt/programming/cation-engine/include/LigandCSVLoader.h \
- /mnt/programming/cation-engine/include/Ligand.h \
  /usr/include/c++/14/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \

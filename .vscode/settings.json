@@ -1,5 +1,12 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "./build/bin/cation_engine_test": true
+        "./build/bin/cation_engine_test": true,
+        "ctest": true,
+        "x86_64-w64-mingw32-g++": true,
+        "g++": true,
+        "./debug_protonation": true,
+        "./debug_calculation": true,
+        "./debug_calculation2": true,
+        "./debug_no_ionic": true
     }
 }
