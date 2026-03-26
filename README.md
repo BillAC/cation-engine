@@ -44,6 +44,7 @@ system.setCationTotal("Ca2+", 5.0);
 system.solve();
 
 double freeCa = system.getFreeConcentration("Ca2+"); // Returns ~155 nM
+```
 
 # Full Build (requires x86_64-w64-mingw32-g++)
 ./build.sh
@@ -54,3 +55,9 @@ double freeCa = system.getFreeConcentration("Ca2+"); // Returns ~155 nM
 
 ## 🖥 Verification
 ./build_tests.sh && ./validation_suite
+
+## 👥 Contributors
+
+* GitHub Copilot (code implementation and solver integration)
+* Gemini 3 Flash (project supervision)
+* Qwen-2.5-Coder (local inference and validation)
