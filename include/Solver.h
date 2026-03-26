@@ -100,7 +100,7 @@ public:
     void SetParameters(const SystemParameters& systemParams);
 
     // Calculate equilibrium concentrations (Free-to-Total)
-    EquilibriumResult CalculateFreeToTotal(double freeLigand, double freeMetal,
+    EquilibriumResult CalculateFreeToTotal(double totalLigand, double freeMetal,
                                          const std::string& ligandName, const std::string& metalName);
 
     // Calculate equilibrium concentrations (Total-to-Free)

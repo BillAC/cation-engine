@@ -273,7 +273,7 @@ double CationSystem::solveForFreeMetal(double totalMetal, double totalLigand, do
 }
 
 // Calculate equilibrium concentrations (Free-to-Total)
-EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double freeMetal,
+EquilibriumResult CationSystem::calculateFreeToTotal(double totalLigand, double freeMetal,
                                                    const std::string& ligandName, const std::string& metalName) {
     EquilibriumResult result;
 
@@ -300,19 +300,19 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double freeLigand, double f
     // K_effective = K_metal * alpha (where alpha is fraction of fully deprotonated form)
     double effectiveK = complexFormationConstant * alpha;
 
-    // Calculate complex concentration using iterative method
-    double complex = solveForFreeMetal(freeMetal, freeLigand, effectiveK, 1e-10, 1000);
+    // For Free-to-Total: we know totalLigand and freeMetal, find totalMetal
+    // We need to solve for freeLigand:
+    // totalLigand = freeLigand + complex
+    // complex = effectiveK * freeMetal * freeLigand
+    // So: totalLigand = freeLigand + effectiveK * freeMetal * freeLigand
+    // freeLigand = totalLigand / (1 + effectiveK * freeMetal)
+    
+    double freeLigand = totalLigand / (1.0 + effectiveK * freeMetal);
+    double complex = effectiveK * freeMetal * freeLigand;
+    double totalMetal = freeMetal + complex;
 
-    // Calculate free concentrations
-    double freeLigandFinal = freeLigand - complex;
-    double freeMetalFinal = freeMetal - complex;
-
-    // Calculate total concentrations
-    double totalLigand = freeLigandFinal + complex;
-    double totalMetal = freeMetalFinal + complex;
-
-    result.freeLigand = freeLigandFinal;
-    result.freeMetal = freeMetalFinal;
+    result.freeLigand = freeLigand;
+    result.freeMetal = freeMetal;
     result.complex = complex;
     result.totalLigand = totalLigand;
     result.totalMetal = totalMetal;
@@ -498,9 +498,9 @@ EquilibriumResult CationSystem::CalculateEquilibrium(double totalLigand, double 
 }
 
 // Calculate equilibrium concentrations (Free-to-Total)
-EquilibriumResult CationSystem::CalculateFreeToTotal(double freeLigand, double freeMetal,
+EquilibriumResult CationSystem::CalculateFreeToTotal(double totalLigand, double freeMetal,
                                                     const std::string& ligandName, const std::string& metalName) {
-    return calculateFreeToTotal(freeLigand, freeMetal, ligandName, metalName);
+    return calculateFreeToTotal(totalLigand, freeMetal, ligandName, metalName);
 }
 
 // Calculate equilibrium concentrations (Total-to-Free)

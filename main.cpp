@@ -2,6 +2,9 @@
 #include "Ligand.h"
 #include "LigandCSVLoader.h"
 #include <iostream>
+#include <vector>
+#include <string>
+#include <ctime>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -12,7 +15,6 @@
 #define IDM_HELP_ABOUT 40003
 
 #define IDC_CALCULATE_BTN 50100
-#define IDC_RESET_BTN 50110
 #define IDC_TEMP_INPUT 50101
 #define IDC_IONIC_INPUT 50102
 #define IDC_PH_INPUT 50103
@@ -37,6 +39,7 @@ static const int g_numLigands = 10;
 
 static CationSystem g_solver;
 static int g_previousUnits[7] = {1, 1, 1, 1, 1, 1, 1}; // Track previous unit for each cation (default uM)
+static bool g_calculationDone = false; // Track if calculation has been performed
 
 static void InitializeAppData() {
     InitializeLigandData();
@@ -116,6 +119,369 @@ static void PopulateCombo(HWND parent, int ctrlId, const std::vector<std::string
     SendMessage(combo, CB_SETCURSEL, 0, 0);
 }
 
+// Ligand Editor Dialog
+#define IDC_LIGAND_LIST 60001
+#define IDC_EDIT_NAME 60002
+#define IDC_EDIT_VALENCE 60003
+#define IDC_EDIT_H1 60004
+#define IDC_EDIT_H2 60005
+#define IDC_EDIT_H3 60006
+#define IDC_EDIT_H4 60007
+#define IDC_EDIT_CA1 60008
+#define IDC_EDIT_MG1 60009
+#define IDC_EDIT_BA1 60010
+#define IDC_EDIT_CD1 60011
+#define IDC_EDIT_SR1 60012
+#define IDC_EDIT_MN1 60013
+#define IDC_EDIT_FE1 60014
+#define IDC_EDIT_CU1 60015
+#define IDC_EDIT_ZN1 60016
+#define IDC_EDIT_DH1 60017
+#define IDC_EDIT_DH2 60018
+#define IDC_EDIT_DH3 60019
+#define IDC_EDIT_DH4 60020
+#define IDC_EDIT_DCA1 60021
+#define IDC_EDIT_DMG1 60022
+#define IDC_EDIT_DBA1 60023
+#define IDC_EDIT_DCD1 60024
+#define IDC_EDIT_DSR1 60025
+#define IDC_EDIT_DMN1 60026
+#define IDC_EDIT_DFE1 60027
+#define IDC_EDIT_DCU1 60028
+#define IDC_EDIT_DZN1 60029
+#define IDC_SAVE_BTN 60030
+#define IDC_CANCEL_BTN 60031
+
+static std::vector<Ligand> g_editorLigands;
+
+static void PopulateLigandList(HWND dlg) {
+    HWND list = GetDlgItem(dlg, IDC_LIGAND_LIST);
+    if (!list) return;
+    SendMessage(list, LB_RESETCONTENT, 0, 0);
+    for (const auto& ligand : g_editorLigands) {
+        SendMessage(list, LB_ADDSTRING, 0, (LPARAM)ligand.name.c_str());
+    }
+}
+
+static void LoadLigandData(HWND dlg, int index) {
+    if (index < 0 || index >= (int)g_editorLigands.size()) return;
+    const Ligand& ligand = g_editorLigands[index];
+    
+    SetTextInCtrl(dlg, IDC_EDIT_NAME, ligand.name.c_str());
+    char buf[32];
+    sprintf(buf, "%d", ligand.valence);
+    SetTextInCtrl(dlg, IDC_EDIT_VALENCE, buf);
+    
+    sprintf(buf, "%.2f", ligand.constants.log_K1);
+    SetTextInCtrl(dlg, IDC_EDIT_H1, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K2);
+    SetTextInCtrl(dlg, IDC_EDIT_H2, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K3);
+    SetTextInCtrl(dlg, IDC_EDIT_H3, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K4);
+    SetTextInCtrl(dlg, IDC_EDIT_H4, buf);
+    
+    sprintf(buf, "%.2f", ligand.constants.Ca1);
+    SetTextInCtrl(dlg, IDC_EDIT_CA1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Mg1);
+    SetTextInCtrl(dlg, IDC_EDIT_MG1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Ba1);
+    SetTextInCtrl(dlg, IDC_EDIT_BA1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Cd1);
+    SetTextInCtrl(dlg, IDC_EDIT_CD1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Sr1);
+    SetTextInCtrl(dlg, IDC_EDIT_SR1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Mn1);
+    SetTextInCtrl(dlg, IDC_EDIT_MN1, buf);
+    sprintf(buf, "%.2f", ligand.constants.X1);
+    SetTextInCtrl(dlg, IDC_EDIT_FE1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Cu1);
+    SetTextInCtrl(dlg, IDC_EDIT_CU1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Zn1);
+    SetTextInCtrl(dlg, IDC_EDIT_ZN1, buf);
+    
+    sprintf(buf, "%.1f", ligand.constants.dH1);
+    SetTextInCtrl(dlg, IDC_EDIT_DH1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dH2);
+    SetTextInCtrl(dlg, IDC_EDIT_DH2, buf);
+    sprintf(buf, "%.1f", ligand.constants.dH3);
+    SetTextInCtrl(dlg, IDC_EDIT_DH3, buf);
+    sprintf(buf, "%.1f", ligand.constants.dH4);
+    SetTextInCtrl(dlg, IDC_EDIT_DH4, buf);
+    
+    sprintf(buf, "%.1f", ligand.constants.dCa1);
+    SetTextInCtrl(dlg, IDC_EDIT_DCA1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dMg1);
+    SetTextInCtrl(dlg, IDC_EDIT_DMG1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dBa1);
+    SetTextInCtrl(dlg, IDC_EDIT_DBA1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dCd1);
+    SetTextInCtrl(dlg, IDC_EDIT_DCD1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dSr1);
+    SetTextInCtrl(dlg, IDC_EDIT_DSR1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dMn1);
+    SetTextInCtrl(dlg, IDC_EDIT_DMN1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dX1);
+    SetTextInCtrl(dlg, IDC_EDIT_DFE1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dCu1);
+    SetTextInCtrl(dlg, IDC_EDIT_DCU1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dZn1);
+    SetTextInCtrl(dlg, IDC_EDIT_DZN1, buf);
+}
+
+static void SaveLigandData(HWND dlg, int index) {
+    if (index < 0 || index >= (int)g_editorLigands.size()) return;
+    Ligand& ligand = g_editorLigands[index];
+    
+    ligand.name = GetTextFromCtrl(dlg, IDC_EDIT_NAME);
+    ligand.valence = atoi(GetTextFromCtrl(dlg, IDC_EDIT_VALENCE).c_str());
+    
+    ligand.constants.log_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H1).c_str());
+    ligand.constants.log_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H2).c_str());
+    ligand.constants.log_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H3).c_str());
+    ligand.constants.log_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H4).c_str());
+    
+    ligand.constants.Ca1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CA1).c_str());
+    ligand.constants.Mg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MG1).c_str());
+    ligand.constants.Ba1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_BA1).c_str());
+    ligand.constants.Cd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CD1).c_str());
+    ligand.constants.Sr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_SR1).c_str());
+    ligand.constants.Mn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MN1).c_str());
+    ligand.constants.X1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_FE1).c_str());
+    ligand.constants.Cu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CU1).c_str());
+    ligand.constants.Zn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_ZN1).c_str());
+    
+    ligand.constants.dH1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH1).c_str());
+    ligand.constants.dH2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH2).c_str());
+    ligand.constants.dH3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH3).c_str());
+    ligand.constants.dH4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH4).c_str());
+    
+    ligand.constants.dCa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCA1).c_str());
+    ligand.constants.dMg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMG1).c_str());
+    ligand.constants.dBa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DBA1).c_str());
+    ligand.constants.dCd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCD1).c_str());
+    ligand.constants.dSr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DSR1).c_str());
+    ligand.constants.dMn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMN1).c_str());
+    ligand.constants.dX1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DFE1).c_str());
+    ligand.constants.dCu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCU1).c_str());
+    ligand.constants.dZn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DZN1).c_str());
+}
+
+static void SaveLigandsToFile() {
+    // Create backup of original file
+    std::string backupName = "ligands.csv.bak";
+    CopyFile("ligands.csv", backupName.c_str(), FALSE);
+    
+    // Save to new file with timestamp
+    time_t now = time(NULL);
+    char timestamp[32];
+    strftime(timestamp, sizeof(timestamp), "%Y%m%d_%H%M%S", localtime(&now));
+    std::string newFileName = std::string("ligands_") + timestamp + ".csv";
+    
+    FILE* f = fopen(newFileName.c_str(), "w");
+    if (!f) return;
+    
+    // Write header
+    fprintf(f, "Ligand,Valence,H1,H2,H3,H4,Ca1,Mg1,Ba1,Cd1,Sr1,Mn1,Fe(II)1,Cu1,Zn1,dH1,dH2,dH3,dH4,dCa1,dMg1,dBa1,dCd1,dSr1,dMn1,dFe(II)1,dCu1,dZn1\n");
+    
+    // Write ligands
+    for (const auto& ligand : g_editorLigands) {
+        fprintf(f, "%s,%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+                ligand.name.c_str(), ligand.valence,
+                ligand.constants.log_K1, ligand.constants.log_K2, ligand.constants.log_K3, ligand.constants.log_K4,
+                ligand.constants.Ca1, ligand.constants.Mg1, ligand.constants.Ba1, ligand.constants.Cd1,
+                ligand.constants.Sr1, ligand.constants.Mn1, ligand.constants.X1, ligand.constants.Cu1, ligand.constants.Zn1,
+                ligand.constants.dH1, ligand.constants.dH2, ligand.constants.dH3, ligand.constants.dH4,
+                ligand.constants.dCa1, ligand.constants.dMg1, ligand.constants.dBa1, ligand.constants.dCd1,
+                ligand.constants.dSr1, ligand.constants.dMn1, ligand.constants.dX1, ligand.constants.dCu1, ligand.constants.dZn1);
+    }
+    
+    fclose(f);
+    
+    MessageBox(NULL, ("Ligands saved to " + newFileName + "\nOriginal backed up as ligands.csv.bak").c_str(), "Save Complete", MB_ICONINFORMATION);
+}
+
+LRESULT CALLBACK LigandEditorProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+    case WM_INITDIALOG: {
+        // Load ligands
+        g_editorLigands = GetAllLigands();
+        PopulateLigandList(dlg);
+        if (!g_editorLigands.empty()) {
+            SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, 0, 0);
+            LoadLigandData(dlg, 0);
+        }
+        return TRUE;
+    }
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case IDC_LIGAND_LIST:
+            if (HIWORD(wParam) == LBN_SELCHANGE) {
+                int index = SendMessage((HWND)lParam, LB_GETCURSEL, 0, 0);
+                LoadLigandData(dlg, index);
+            }
+            break;
+        case IDC_SAVE_BTN:
+            {
+                int index = SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_GETCURSEL, 0, 0);
+                SaveLigandData(dlg, index);
+                SaveLigandsToFile();
+            }
+            break;
+        case IDC_CANCEL_BTN:
+            EndDialog(dlg, 0);
+            break;
+        }
+        break;
+    case WM_CLOSE:
+        EndDialog(dlg, 0);
+        break;
+    }
+    return FALSE;
+}
+
+static void ShowLigandEditorDialog(HWND parent) {
+    // Register window class for ligand editor dialog
+    static bool classRegistered = false;
+    if (!classRegistered) {
+        WNDCLASSEX wc = {0};
+        wc.cbSize = sizeof(wc);
+        wc.style = CS_HREDRAW | CS_VREDRAW;
+        wc.lpfnWndProc = LigandEditorProc;
+        wc.hInstance = GetModuleHandle(NULL);
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wc.lpszClassName = "LigandEditorDialog";
+        RegisterClassEx(&wc);
+        classRegistered = true;
+    }
+    
+    // Create dialog window
+    HWND dlg = CreateWindowEx(WS_EX_DLGMODALFRAME, "LigandEditorDialog", "Ligand Editor", 
+                             WS_VISIBLE | WS_POPUP | WS_CAPTION | WS_SYSMENU,
+                             100, 100, 800, 600, parent, NULL, GetModuleHandle(NULL), NULL);
+    
+    if (!dlg) return;
+    
+    // Store dialog handle for message handling
+    SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)parent);
+    
+    // Create controls
+    int y = 10;
+    
+    // Ligand list
+    CreateWindow("STATIC", "Ligands:", WS_VISIBLE | WS_CHILD, 10, y, 100, 20, dlg, NULL, NULL, NULL);
+    y += 25;
+    CreateWindow("LISTBOX", "", WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_NOTIFY | WS_VSCROLL, 
+                10, y, 150, 400, dlg, (HMENU)IDC_LIGAND_LIST, NULL, NULL);
+    y += 10;
+    
+    // Edit fields
+    int x = 180;
+    y = 10;
+    
+    CreateWindow("STATIC", "Name:", WS_VISIBLE | WS_CHILD, x, y, 50, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+60, y, 100, 20, dlg, (HMENU)IDC_EDIT_NAME, NULL, NULL);
+    y += 30;
+    
+    CreateWindow("STATIC", "Valence:", WS_VISIBLE | WS_CHILD, x, y, 50, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+60, y, 100, 20, dlg, (HMENU)IDC_EDIT_VALENCE, NULL, NULL);
+    y += 30;
+    
+    // Protonation constants
+    CreateWindow("STATIC", "H1 (pKa1):", WS_VISIBLE | WS_CHILD, x, y, 60, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+70, y, 60, 20, dlg, (HMENU)IDC_EDIT_H1, NULL, NULL);
+    CreateWindow("STATIC", "H2 (pKa2):", WS_VISIBLE | WS_CHILD, x+140, y, 60, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+210, y, 60, 20, dlg, (HMENU)IDC_EDIT_H2, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "H3 (pKa3):", WS_VISIBLE | WS_CHILD, x, y, 60, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+70, y, 60, 20, dlg, (HMENU)IDC_EDIT_H3, NULL, NULL);
+    CreateWindow("STATIC", "H4 (pKa4):", WS_VISIBLE | WS_CHILD, x+140, y, 60, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+210, y, 60, 20, dlg, (HMENU)IDC_EDIT_H4, NULL, NULL);
+    y += 30;
+    
+    // Metal binding constants
+    CreateWindow("STATIC", "Ca1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_CA1, NULL, NULL);
+    CreateWindow("STATIC", "Mg1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_MG1, NULL, NULL);
+    CreateWindow("STATIC", "Ba1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_BA1, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "Cd1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_CD1, NULL, NULL);
+    CreateWindow("STATIC", "Sr1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_SR1, NULL, NULL);
+    CreateWindow("STATIC", "Mn1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_MN1, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "Fe1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_FE1, NULL, NULL);
+    CreateWindow("STATIC", "Cu1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_CU1, NULL, NULL);
+    CreateWindow("STATIC", "Zn1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_ZN1, NULL, NULL);
+    y += 30;
+    
+    // Enthalpy values
+    CreateWindow("STATIC", "ΔH1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH1, NULL, NULL);
+    CreateWindow("STATIC", "ΔH2:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH2, NULL, NULL);
+    CreateWindow("STATIC", "ΔH3:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH3, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "ΔH4:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH4, NULL, NULL);
+    y += 30;
+    
+    // Metal enthalpy values
+    CreateWindow("STATIC", "ΔCa1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCA1, NULL, NULL);
+    CreateWindow("STATIC", "ΔMg1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DMG1, NULL, NULL);
+    CreateWindow("STATIC", "ΔBa1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DBA1, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "ΔCd1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCD1, NULL, NULL);
+    CreateWindow("STATIC", "ΔSr1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DSR1, NULL, NULL);
+    CreateWindow("STATIC", "ΔMn1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DMN1, NULL, NULL);
+    y += 25;
+    CreateWindow("STATIC", "ΔFe1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DFE1, NULL, NULL);
+    CreateWindow("STATIC", "ΔCu1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCU1, NULL, NULL);
+    CreateWindow("STATIC", "ΔZn1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
+    CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DZN1, NULL, NULL);
+    y += 40;
+    
+    // Buttons
+    CreateWindow("BUTTON", "Save", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 200, y, 80, 25, dlg, (HMENU)IDC_SAVE_BTN, NULL, NULL);
+    CreateWindow("BUTTON", "Cancel", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 300, y, 80, 25, dlg, (HMENU)IDC_CANCEL_BTN, NULL, NULL);
+    
+    // Initialize dialog
+    g_editorLigands = GetAllLigands();
+    PopulateLigandList(dlg);
+    if (!g_editorLigands.empty()) {
+        SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, 0, 0);
+        LoadLigandData(dlg, 0);
+    }
+    
+    // Run modal message loop
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (msg.message == WM_CLOSE && msg.hwnd == dlg) {
+            DestroyWindow(dlg);
+            break;
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
     case WM_CREATE: {
@@ -148,7 +514,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         y += 25;
         
         CreateWindow("STATIC", "pH:", WS_VISIBLE | WS_CHILD, 20, y, 120, 20, hwnd, NULL, NULL, NULL);
-        CreateWindow("EDIT", "7.0", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, y, 80, 20, hwnd, (HMENU)IDC_PH_INPUT, NULL, NULL);
+        CreateWindow("EDIT", "7.2", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, y, 80, 20, hwnd, (HMENU)IDC_PH_INPUT, NULL, NULL);
         y += 30;
 
         // Ligands section
@@ -190,9 +556,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 
         y += 10;
 
-        // Calculate and Reset buttons
+        // Calculate button
         CreateWindow("BUTTON", "Calculate", WS_VISIBLE | WS_CHILD, 20, y, 100, 30, hwnd, (HMENU)IDC_CALCULATE_BTN, NULL, NULL);
-        CreateWindow("BUTTON", "Reset", WS_VISIBLE | WS_CHILD, 130, y, 80, 30, hwnd, (HMENU)IDC_RESET_BTN, NULL, NULL);
         y += 45;
 
         // Output text
@@ -217,12 +582,23 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             PostQuitMessage(0);
             return 0;
         case IDM_LIGAND_EDITOR:
-            MessageBox(hwnd, "Ligand Editor feature coming in next update.\nCurrently, ligand data is read from ligands.csv.", "Info", MB_ICONINFORMATION);
+            ShowLigandEditorDialog(hwnd);
             return 0;
         case IDM_HELP_ABOUT:
             MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
             return 0;
         case IDC_CALCULATE_BTN: {
+            if (g_calculationDone) {
+                // Reset mode: clear all inputs and change back to Calculate
+                for (int i = 0; i < g_numCations; i++) {
+                    SetDlgItemText(hwnd, IDC_CATION_FREE_BASE + i, "");
+                    SetDlgItemText(hwnd, IDC_CATION_TOTAL_BASE + i, "");
+                }
+                SetOutputText(hwnd, "Ready. Configure ligands and solution parameters, then click Calculate.");
+                SetDlgItemText(hwnd, IDC_CALCULATE_BTN, "Calculate");
+                g_calculationDone = false;
+                return 0;
+            }
             // Get solution parameters
             double temp = GetDoubleFromCtrl(hwnd, IDC_TEMP_INPUT);
             double ionic = GetDoubleFromCtrl(hwnd, IDC_IONIC_INPUT);
@@ -239,7 +615,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             std::string output = "=== Equilibrium Calculation Results ===\n";
             output += "\n";
             output += "Solution Parameters:\n";
-            output += "────────────────────────\n";
+            output += "------------------------\n";
             char buf[128];
             sprintf(buf, "  Temperature: %.1f °C\n", temp);
             output += buf;
@@ -249,7 +625,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             output += buf;
 
             output += "Selected Ligands:\n";
-            output += "────────────────────────\n";
+            output += "------------------------\n";
             for (int i = 0; i < g_numLigands; i++) {
                 int ligandIdx = SendDlgItemMessage(hwnd, IDC_LIGAND_COMBO_BASE + i, CB_GETCURSEL, 0, 0);
                 if (ligandIdx > 0) { // Skip <None>
@@ -263,7 +639,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             output += "\n";
 
             output += "Cation Calculations:\n";
-            output += "────────────────────────\n\n";
+            output += "------------------------\n\n";
 
             for (int i = 0; i < g_numCations; i++) {
                 double free = GetDoubleFromCtrl(hwnd, IDC_CATION_FREE_BASE + i);
@@ -344,6 +720,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             }
 
             SetOutputText(hwnd, output);
+            
+            // Change Calculate button to Reset after calculation
+            SetDlgItemText(hwnd, IDC_CALCULATE_BTN, "Reset");
+            g_calculationDone = true;
+            
             return 0;
         }
         // Handle unit combo box changes
@@ -383,16 +764,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                 return 0;
             }
             break;
-        }
-        case IDC_RESET_BTN: {
-            // Clear all cation free and total boxes
-            for (int i = 0; i < g_numCations; i++) {
-                SetDlgItemText(hwnd, IDC_CATION_FREE_BASE + i, "");
-                SetDlgItemText(hwnd, IDC_CATION_TOTAL_BASE + i, "");
-            }
-            // Clear output
-            SetOutputText(hwnd, "");
-            return 0;
         }
         }
         break;
