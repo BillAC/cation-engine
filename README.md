@@ -20,6 +20,18 @@ A high-precision Win32 C++ application for calculating the equilibrium concentra
 
 The engine is powered by a strictly audited `ligands.csv` containing constants standardized to $0.1M$ ionic strength at $25^\circ C$. Supported ligands include:
 
+## ✅ Recent test cases added
+
+Automatic cases in `test/SolverTest.cpp` now include:
+
+1. `EGTA` + `Ca2+` (10 mM ligand, 5 mM Ca total, pH 7.2) => Free Ca ≈ 6.78e-8 M
+2. `EDTA` + `Mg2+` (10 mM ligand, target free 1 mM, pH 7.0) => Total Mg ≈ 1.10e-2 M
+3. `BAPTA` + competitive `Ca2+/Mg2+` (5 mM ligand, Ca free target 100 nM, Mg total 1 mM, pH 7.2) => Total Ca ≈ 2.18e-3 M, Free Mg ≈ 8.79e-4 M
+
+These cases verify direct pH-corrected stability constants and the new mixed-constrained solver path.
+
+## 🧪 Validation CLI
+
 * **Chelators:** EGTA, EDTA, BAPTA, NTA, HEDTA, TPEN, ADA.
 * **Biological/Organic:** ATP, ADP, AMP, Citrate, Aspartate, Glutamate, Glycinate, Gluconate.
 

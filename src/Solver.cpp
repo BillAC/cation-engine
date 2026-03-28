@@ -163,15 +163,13 @@ double CationSystem::calculateStabilityConstant(const Ligand* ligand, const std:
     double deltaH = getMetalEnthalpyConstant(ligand, metalName);
 
     double tempCorr = calculateTemperatureCorrection(params.temperature, deltaH);
-    
-    // For now, disable ionic strength correction as the CSV constants appear to be conditional
+    // ionic strength correction is available in separate method (not used here or set to 1)
     double ionicCorr = 1.0;
 
-    // For metal-ligand binding constants, the logK values in the CSV are already
-    // for the fully deprotonated ligand form, so we don't apply protonation correction
-    // The protonation correction is handled separately in the equilibrium calculations
+    // Direct pH-corrected stability constant via protonation fraction
+    double alpha = calculateProtonationFraction(params.pH, ligand);
 
-    double effectiveK = K * tempCorr * ionicCorr;
+    double effectiveK = K * tempCorr * ionicCorr * alpha;
     if (effectiveK < 1e-300) {
         // Underflow protection
         effectiveK = 0.0;
@@ -272,6 +270,143 @@ double CationSystem::solveForFreeMetal(double totalMetal, double totalLigand, do
     return (low + high) / 2.0;
 }
 
+// Newton-Raphson solver for coupled multi-metal ligand equilibria
+bool CationSystem::solveCoupledEquilibriumNewton(double totalLigand,
+                                                 const std::vector<double>& totalMetals,
+                                                 const std::vector<double>& Kvalues,
+                                                 double& freeLigand,
+                                                 std::vector<double>& freeMetals,
+                                                 double tolerance,
+                                                 int maxIterations) {
+    size_t n = totalMetals.size();
+    if (n == 0 || totalLigand <= 0 || Kvalues.size() != n) {
+        return false;
+    }
+
+    // Initialize variables with reasonable bounds
+    if (freeLigand <= 0.0 || freeLigand > totalLigand) {
+        freeLigand = std::max(1e-12, totalLigand * 0.5);
+    }
+
+    freeMetals.resize(n);
+    for (size_t i = 0; i < n; ++i) {
+        freeMetals[i] = totalMetals[i];
+    }
+
+    for (int iter = 0; iter < maxIterations; ++iter) {
+        // Calculate complexes and residuals
+        std::vector<double> complex(n);
+        std::vector<double> residue(n+1);
+
+        double sumComplex = 0.0;
+        for (size_t i = 0; i < n; ++i) {
+            complex[i] = Kvalues[i] * freeMetals[i] * freeLigand;
+            sumComplex += complex[i];
+            residue[i+1] = totalMetals[i] - freeMetals[i] - complex[i];
+        }
+        residue[0] = totalLigand - freeLigand - sumComplex;
+
+        // Check convergence on all equations
+        double maxErr = 0.0;
+        for (double r : residue) {
+            maxErr = std::max(maxErr, std::abs(r));
+        }
+        if (maxErr < tolerance) {
+            return true;
+        }
+
+        // Build Jacobian matrix (n+1 x n+1) as dense vector of vectors
+        std::vector<std::vector<double>> J(n+1, std::vector<double>(n+1, 0.0));
+
+        // d(res0)/d(Lfree)
+        double sumKf = 0.0;
+        for (size_t i = 0; i < n; ++i) {
+            sumKf += Kvalues[i] * freeMetals[i];
+        }
+        J[0][0] = -1.0 - sumKf;
+
+        // d(res0)/d(Mfree_i)
+        for (size_t i = 0; i < n; ++i) {
+            J[0][i+1] = -Kvalues[i] * freeLigand;
+        }
+
+        for (size_t i = 0; i < n; ++i) {
+            // d(res_i+1)/d(Lfree)
+            J[i+1][0] = -Kvalues[i] * freeMetals[i];
+            // d(res_i+1)/d(Mfree_i)
+            J[i+1][i+1] = -1.0 - Kvalues[i] * freeLigand;
+        }
+
+        // Solve J * dx = residue with simple Gaussian elimination
+        // We need dx = J^{-1} * residue, where we treat residue vector as RHS
+        // Pivot matrix and RHS
+        std::vector<std::vector<double>> A = J;
+        std::vector<double> b(n+1);
+        for (size_t i = 0; i < n+1; ++i) b[i] = residue[i];
+
+        // Gaussian elimination
+        for (size_t i = 0; i < n+1; ++i) {
+            // Partial pivot
+            size_t pivot = i;
+            double maxVal = std::abs(A[i][i]);
+            for (size_t j = i+1; j < n+1; ++j) {
+                double val = std::abs(A[j][i]);
+                if (val > maxVal) {
+                    maxVal = val;
+                    pivot = j;
+                }
+            }
+            if (maxVal < 1e-18) {
+                // Singular matrix; fallback
+                return false;
+            }
+            if (pivot != i) {
+                std::swap(A[i], A[pivot]);
+                std::swap(b[i], b[pivot]);
+            }
+
+            double diag = A[i][i];
+            for (size_t j = i; j < n+1; ++j) {
+                A[i][j] /= diag;
+            }
+            b[i] /= diag;
+
+            for (size_t k = i+1; k < n+1; ++k) {
+                double factor = A[k][i];
+                for (size_t j = i; j < n+1; ++j) {
+                    A[k][j] -= factor * A[i][j];
+                }
+                b[k] -= factor * b[i];
+            }
+        }
+
+        // Back substitution for dx
+        std::vector<double> dx(n+1, 0.0);
+        for (int i = (int)n; i >= 0; --i) {
+            double sum = b[i];
+            for (size_t j = i+1; j < n+1; ++j) {
+                sum -= A[i][j] * dx[j];
+            }
+            dx[i] = sum;
+        }
+
+        // Update unknowns with damping to avoid overshoot
+        double damping = 0.5;
+        freeLigand -= damping * dx[0];
+        freeLigand = std::min(std::max(freeLigand, 0.0), totalLigand);
+
+        for (size_t i = 0; i < n; ++i) {
+            freeMetals[i] -= damping * dx[i+1];
+            freeMetals[i] = std::max(0.0, std::min(freeMetals[i], totalMetals[i]));
+        }
+
+        // Ensure ligand is mass-balanced if we drifted
+        if (freeLigand <= 0.0) freeLigand = 1e-15;
+    }
+
+    return false;
+}
+
 // Calculate equilibrium concentrations (Free-to-Total)
 EquilibriumResult CationSystem::calculateFreeToTotal(double totalLigand, double freeMetal,
                                                    const std::string& ligandName, const std::string& metalName) {
@@ -293,12 +428,8 @@ EquilibriumResult CationSystem::calculateFreeToTotal(double totalLigand, double 
 
     double complexFormationConstant = std::pow(10.0, logK_metal);
 
-    // Calculate protonation fraction for the ligand
-    double alpha = calculateProtonationFraction(params.pH, ligand);
-
-    // The effective binding constant needs to account for ligand protonation
-    // K_effective = K_metal * alpha (where alpha is fraction of fully deprotonated form)
-    double effectiveK = complexFormationConstant * alpha;
+    // K_metal is already corrected for pH in calculateStabilityConstant
+    double effectiveK = complexFormationConstant;
 
     // For Free-to-Total: we know totalLigand and freeMetal, find totalMetal
     // We need to solve for freeLigand:
@@ -342,11 +473,8 @@ EquilibriumResult CationSystem::calculateTotalToFree(double totalLigand, double 
 
     double complexFormationConstant = std::pow(10.0, logK_metal);
 
-    // Calculate protonation fraction for the ligand
-    double alpha = calculateProtonationFraction(params.pH, ligand);
-
-    // The effective binding constant needs to account for ligand protonation
-    double effectiveK = complexFormationConstant * alpha;
+    // K_metal is already corrected for pH in calculateStabilityConstant
+    double effectiveK = complexFormationConstant;
 
     // Calculate complex concentration using iterative method
     double complex = solveForFreeMetal(totalMetal, totalLigand, effectiveK, 1e-10, 1000);
@@ -416,6 +544,24 @@ EquilibriumMultiResult CationSystem::CalculateTotalToFreeMulti(double totalLigan
         return result;
     }
 
+    // Try Newton-Raphson on the full coupled system
+    double Lfree = totalLigand * 0.5;
+    std::vector<double> Mfree = totalMetals;
+    bool nrOk = solveCoupledEquilibriumNewton(totalLigand, totalMetals, Kvalues,
+                                              Lfree, Mfree, 1e-12, 200);
+
+    if (nrOk) {
+        result.freeLigand = Lfree;
+        result.freeMetals = Mfree;
+        result.complex.resize(n);
+
+        for (size_t i = 0; i < n; ++i) {
+            result.complex[i] = totalMetals[i] - result.freeMetals[i];
+        }
+        return result;
+    }
+
+    // Newton failed; fallback to bisection on single variable Lfree
     double mid = 0.0;
     for (int iter = 0; iter < 200; ++iter) {
         mid = (lower + upper) / 2.0;
@@ -432,7 +578,7 @@ EquilibriumMultiResult CationSystem::CalculateTotalToFreeMulti(double totalLigan
         }
     }
 
-    double Lfree = mid;
+    Lfree = mid;
     result.freeLigand = Lfree;
     result.complex.resize(n);
     result.freeMetals.resize(n);
@@ -491,32 +637,152 @@ EquilibriumMultiResult CationSystem::CalculateFreeToTotalMulti(double freeLigand
     return result;
 }
 
-// Calculate equilibrium concentrations (both directions)
-EquilibriumResult CationSystem::CalculateEquilibrium(double totalLigand, double totalMetal,
-                                                    const std::string& ligandName, const std::string& metalName) {
-    return calculateTotalToFree(totalLigand, totalMetal, ligandName, metalName);
-}
+// Constrained multi-metal: find total concentration of one metal to achieve target free concentration
+EquilibriumResult CationSystem::CalculateConstrainedMulti(double totalLigand,
+                                                         const std::vector<double>& knownTotalMetals,
+                                                         const std::vector<std::string>& knownMetalNames,
+                                                         double targetFreeMetal,
+                                                         const std::string& targetMetalName,
+                                                         const std::string& ligandName) {
+    EquilibriumResult result;
 
-// Calculate equilibrium concentrations (Free-to-Total)
-EquilibriumResult CationSystem::CalculateFreeToTotal(double totalLigand, double freeMetal,
-                                                    const std::string& ligandName, const std::string& metalName) {
-    return calculateFreeToTotal(totalLigand, freeMetal, ligandName, metalName);
-}
+    if (knownTotalMetals.size() != knownMetalNames.size()) {
+        return result;
+    }
 
-// Calculate equilibrium concentrations (Total-to-Free)
-EquilibriumResult CationSystem::CalculateTotalToFree(double totalLigand, double totalMetal,
-                                                    const std::string& ligandName, const std::string& metalName) {
-    return calculateTotalToFree(totalLigand, totalMetal, ligandName, metalName);
-}
+    const Ligand* ligand = GetLigandByName(ligandName);
+    const Metal* targetMetal = GetMetalByName(targetMetalName);
+    if (!ligand || !targetMetal) {
+        return result;
+    }
 
-// Add ligand to the system
-void CationSystem::AddLigand(const Ligand& ligand) {
-    ligands.push_back(ligand);
-}
+    // Get binding constants
+    size_t n_known = knownMetalNames.size();
+    std::vector<double> K_known(n_known, 0.0);
+    for (size_t i = 0; i < n_known; ++i) {
+        double logK = calculateStabilityConstant(ligand, knownMetalNames[i]);
+        K_known[i] = (logK > 0.0) ? std::pow(10.0, logK) : 0.0;
+    }
 
-// Add metal to the system
-void CationSystem::AddMetal(const Metal& metal) {
-    metals.push_back(metal);
+    double K_target = 0.0;
+    double logK_target = calculateStabilityConstant(ligand, targetMetalName);
+    K_target = (logK_target > 0.0) ? std::pow(10.0, logK_target) : 0.0;
+
+    // Function to evaluate: for a given total_target, what is free_target?
+    auto evaluateFreeTarget = [&](double totalTarget) -> double {
+        // Iterative solution for competitive binding
+        double Lfree = totalLigand; // Initial guess
+
+        for (int iter = 0; iter < 100; ++iter) {
+            // Calculate free concentrations
+            double free_target = totalTarget / (1.0 + K_target * Lfree);
+
+            std::vector<double> free_known(n_known);
+            for (size_t i = 0; i < n_known; ++i) {
+                free_known[i] = knownTotalMetals[i] / (1.0 + K_known[i] * Lfree);
+            }
+
+            // Calculate new free ligand
+            double denominator = 1.0 + K_target * free_target;
+            for (size_t i = 0; i < n_known; ++i) {
+                denominator += K_known[i] * free_known[i];
+            }
+            double new_Lfree = totalLigand / denominator;
+
+            // Check convergence
+            double diff = std::abs(new_Lfree - Lfree);
+            Lfree = new_Lfree;
+
+            if (diff < 1e-12) break;
+        }
+
+        // Now calculate the actual free target
+        double free_target = totalTarget / (1.0 + K_target * Lfree);
+
+        return free_target;
+    };
+
+    // Find total_target such that free_target = targetFreeMetal
+    double total_lower = targetFreeMetal; // Minimum possible
+    double total_upper = targetFreeMetal * 1e5; // Large upper bound
+    double best_total = targetFreeMetal;
+    double best_error = 1e9;
+
+    for (int iter = 0; iter < 50; ++iter) {
+        double total_mid = (total_lower + total_upper) / 2.0;
+        double free_result = evaluateFreeTarget(total_mid);
+        double error = std::abs(free_result - targetFreeMetal);
+
+        if (error < best_error) {
+            best_error = error;
+            best_total = total_mid;
+        }
+
+        if (free_result > targetFreeMetal) {
+            total_upper = total_mid;
+        } else {
+            total_lower = total_mid;
+        }
+
+        if (error < 1e-12) {
+            break;
+        }
+    }
+
+    // Now compute the final result using the best total
+    double final_Lfree = 0.0;
+    auto f_final = [&](double Lfree) -> double {
+        double sumComplex = 0.0;
+        for (size_t i = 0; i < n_known; ++i) {
+            sumComplex += calculateComplexFromLigandFree(knownTotalMetals[i], K_known[i], Lfree);
+        }
+        double complex_target = (K_target * best_total * Lfree) / (1.0 + K_target * Lfree);
+        sumComplex += complex_target;
+        return totalLigand - Lfree - sumComplex;
+    };
+
+    // Find final Lfree
+    double L_lower = 0.0;
+    double L_upper = totalLigand;
+    for (int iter = 0; iter < 100; ++iter) {
+        final_Lfree = (L_lower + L_upper) / 2.0;
+        double f_val = f_final(final_Lfree);
+        if (std::abs(f_val) < 1e-12) {
+            break;
+        }
+        if (f_val > 0) {
+            L_lower = final_Lfree;
+        } else {
+            L_upper = final_Lfree;
+        }
+    }
+
+    // Calculate final values
+    double final_complex_target = (K_target * best_total * final_Lfree) / (1.0 + K_target * final_Lfree);
+    double final_free_target = best_total - final_complex_target;
+
+    // Calculate free known metals
+    std::vector<double> free_known(n_known);
+    for (size_t i = 0; i < n_known; ++i) {
+        double complex_known = calculateComplexFromLigandFree(knownTotalMetals[i], K_known[i], final_Lfree);
+        free_known[i] = knownTotalMetals[i] - complex_known;
+    }
+
+    result.totalMetal = best_total;
+    if (n_known > 0) {
+        result.freeMetal = free_known[0]; // Free known metal (first in vector)
+    } else {
+        // With no known competing metal, the target metal is the only metal
+        double target_complex = (K_target * best_total * final_Lfree) / (1.0 + K_target * final_Lfree);
+        result.freeMetal = best_total - target_complex;
+    }
+    result.freeLigand = final_Lfree;
+    result.complex = final_complex_target;
+    result.totalLigand = totalLigand;
+    result.ionicStrength = params.ionicStrength;
+    result.pH = params.pH;
+
+    return result;
 }
 
 // Clear all data
@@ -592,4 +858,32 @@ double CationSystem::GetEquilibriumConstant(const std::string& key) const {
         return it->second;
     }
     return 0.0;
+}
+
+// Calculate equilibrium concentrations (both directions)
+EquilibriumResult CationSystem::CalculateEquilibrium(double totalLigand, double totalMetal,
+                                                    const std::string& ligandName, const std::string& metalName) {
+    return calculateTotalToFree(totalLigand, totalMetal, ligandName, metalName);
+}
+
+// Calculate equilibrium concentrations (Free-to-Total)
+EquilibriumResult CationSystem::CalculateFreeToTotal(double totalLigand, double freeMetal,
+                                                    const std::string& ligandName, const std::string& metalName) {
+    return calculateFreeToTotal(totalLigand, freeMetal, ligandName, metalName);
+}
+
+// Calculate equilibrium concentrations (Total-to-Free)
+EquilibriumResult CationSystem::CalculateTotalToFree(double totalLigand, double totalMetal,
+                                                    const std::string& ligandName, const std::string& metalName) {
+    return calculateTotalToFree(totalLigand, totalMetal, ligandName, metalName);
+}
+
+// Add ligand to the system
+void CationSystem::AddLigand(const Ligand& ligand) {
+    ligands.push_back(ligand);
+}
+
+// Add metal to the system
+void CationSystem::AddMetal(const Metal& metal) {
+    metals.push_back(metal);
 }

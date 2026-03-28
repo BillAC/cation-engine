@@ -75,6 +75,15 @@ private:
     double solveForFreeMetal(double totalMetal, double totalLigand, double complexFormationConstant,
                            double tolerance = 1e-10, int maxIterations = 1000);
 
+    // Newton-Raphson solver for coupled multi-metal ligand equations
+    bool solveCoupledEquilibriumNewton(double totalLigand,
+                                      const std::vector<double>& totalMetals,
+                                      const std::vector<double>& Kvalues,
+                                      double& freeLigand,
+                                      std::vector<double>& freeMetals,
+                                      double tolerance = 1e-12,
+                                      int maxIterations = 100);
+
     // Helper for multispecies 1:1 complex formation, given free ligand
     double calculateComplexFromLigandFree(double totalMetal, double K, double freeLigand);
 
@@ -117,6 +126,14 @@ public:
                                                     const std::vector<double>& freeMetals,
                                                     const std::string& ligandName,
                                                     const std::vector<std::string>& metalNames);
+
+    // Constrained multi-metal: find total concentration of one metal to achieve target free concentration
+    EquilibriumResult CalculateConstrainedMulti(double totalLigand,
+                                               const std::vector<double>& knownTotalMetals,
+                                               const std::vector<std::string>& knownMetalNames,
+                                               double targetFreeMetal,
+                                               const std::string& targetMetalName,
+                                               const std::string& ligandName);
 
     // Calculate equilibrium concentrations (both directions)
     EquilibriumResult CalculateEquilibrium(double totalLigand, double totalMetal,
