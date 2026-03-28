@@ -83,7 +83,7 @@ void LoadLigandDataFromCSV(const std::string& filename) {
         }
 
         // Extract stability constants using correct 28-column mapping
-        // CSV columns: Ligand(0), Valence(1), 
+        // CSV columns: Ligand(0), Valence(1),
         //   H1-H4(2-5), Ca1-Zn1(6-14), dH1-dH4(15-18), dCa1-dZn1(19-27)
         StabilityConstants sc(
             // H1-H4 protonation constants (indices 2-5)

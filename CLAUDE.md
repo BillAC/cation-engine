@@ -4,7 +4,7 @@
 Calculate free vs. total concentrations for divalent cations (Ca2+,	Mg2+,	Ba2+,	Cd2+,	Sr2+,	Mn2+,	Cu2+,	Zn2+) in complexing solutions using an iterative bounding method.
 
 ### Scientific Implementation Details
-- **Algorithm:** The technique is an iterative one providing upper and lower bounds for unknowns without requiring initial guesses. It must work for concentrations many orders of magnitude apart.
+- **Algorithm:** The technique provides upper and lower bounds for unknowns without requiring initial guesses. It must work for concentrations many orders of magnitude apart.
 - **Scope:** Restricted to one cation binding to a given ligand at a time (1:1 stoichiometry per site). Applicable to large molecules with multiple independent "sub-ligands".
 - **Physiological Corrections:** Implement the Van 't Hoff equation for temperature correction and the Davies (or Extended Debye-Hückel) equation for ionic strength correction within `CationSystem::calculateStabilityConstant`.
 - **Protonation:** Ensure the protonation/pH-dependent binding fractions for ligands are calculated using the multi-step protonation constants ($pK_a$ values) from the 'ligands.CSV'.
@@ -23,7 +23,7 @@ Calculate free vs. total concentrations for divalent cations (Ca2+,	Mg2+,	Ba2+,	
     - Col 2: "Total Concentration" Input (mM).
     - Constraint: Radio-style exclusivity (User enters either Free or Total per row).
 - **Solution Parameters:** Temperature (ºC), Ionic Strength (mM), and pH.
-- **Menu System:** Ligand Editor for viewing/saving -logK, Enthalpy (H), valence, and standard conditions. Automatic backups on save.
+- **Menu System:** Ligand Editor for viewing/saving -logK, Enthalpy (H), valence, and standard conditions. Automatic backups on save without overwriting the 'ligands.csv' file.
 
 ## Technical & Scientific Constraints
 - **Target:** Native Windows 11 GUI (Win32 API). x86_64-w64-mingw32-g++.
