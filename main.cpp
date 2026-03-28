@@ -12,6 +12,7 @@
 
 #define IDM_FILE_EXIT 40001
 #define IDM_LIGAND_EDITOR 40002
+#define IDM_FILE_ADD_LIGAND 40004
 #define IDM_HELP_ABOUT 40003
 
 #define IDC_CALCULATE_BTN 50100
@@ -40,6 +41,9 @@ static const int g_numLigands = 10;
 static CationSystem g_solver;
 static int g_previousUnits[7] = {1, 1, 1, 1, 1, 1, 1}; // Track previous unit for each cation (default uM)
 static bool g_calculationDone = false; // Track if calculation has been performed
+
+enum class LigandEditorMode { Add, Edit };
+static LigandEditorMode g_ligandEditorMode = LigandEditorMode::Edit;
 
 static void InitializeAppData() {
     InitializeLigandData();
@@ -151,6 +155,7 @@ static void PopulateCombo(HWND parent, int ctrlId, const std::vector<std::string
 #define IDC_EDIT_DZN1 60029
 #define IDC_SAVE_BTN 60030
 #define IDC_CANCEL_BTN 60031
+#define IDC_NEW_LIGAND_BTN 60032
 
 static std::vector<Ligand> g_editorLigands;
 
@@ -200,13 +205,13 @@ static void LoadLigandData(HWND dlg, int index) {
     sprintf(buf, "%.2f", ligand.constants.Zn1);
     SetTextInCtrl(dlg, IDC_EDIT_ZN1, buf);
     
-    sprintf(buf, "%.1f", ligand.constants.dH1);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K1);
     SetTextInCtrl(dlg, IDC_EDIT_DH1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dH2);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K2);
     SetTextInCtrl(dlg, IDC_EDIT_DH2, buf);
-    sprintf(buf, "%.1f", ligand.constants.dH3);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K3);
     SetTextInCtrl(dlg, IDC_EDIT_DH3, buf);
-    sprintf(buf, "%.1f", ligand.constants.dH4);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K4);
     SetTextInCtrl(dlg, IDC_EDIT_DH4, buf);
     
     sprintf(buf, "%.1f", ligand.constants.dCa1);
@@ -251,10 +256,10 @@ static void SaveLigandData(HWND dlg, int index) {
     ligand.constants.Cu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CU1).c_str());
     ligand.constants.Zn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_ZN1).c_str());
     
-    ligand.constants.dH1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH1).c_str());
-    ligand.constants.dH2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH2).c_str());
-    ligand.constants.dH3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH3).c_str());
-    ligand.constants.dH4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH4).c_str());
+    ligand.constants.dlog_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH1).c_str());
+    ligand.constants.dlog_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH2).c_str());
+    ligand.constants.dlog_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH3).c_str());
+    ligand.constants.dlog_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH4).c_str());
     
     ligand.constants.dCa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCA1).c_str());
     ligand.constants.dMg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMG1).c_str());
@@ -291,7 +296,7 @@ static void SaveLigandsToFile() {
                 ligand.constants.log_K1, ligand.constants.log_K2, ligand.constants.log_K3, ligand.constants.log_K4,
                 ligand.constants.Ca1, ligand.constants.Mg1, ligand.constants.Ba1, ligand.constants.Cd1,
                 ligand.constants.Sr1, ligand.constants.Mn1, ligand.constants.X1, ligand.constants.Cu1, ligand.constants.Zn1,
-                ligand.constants.dH1, ligand.constants.dH2, ligand.constants.dH3, ligand.constants.dH4,
+                ligand.constants.dlog_K1, ligand.constants.dlog_K2, ligand.constants.dlog_K3, ligand.constants.dlog_K4,
                 ligand.constants.dCa1, ligand.constants.dMg1, ligand.constants.dBa1, ligand.constants.dCd1,
                 ligand.constants.dSr1, ligand.constants.dMn1, ligand.constants.dX1, ligand.constants.dCu1, ligand.constants.dZn1);
     }
@@ -321,11 +326,94 @@ LRESULT CALLBACK LigandEditorProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPar
                 LoadLigandData(dlg, index);
             }
             break;
+        case IDC_NEW_LIGAND_BTN:
+            {
+                // Clear fields to create a new ligand entry
+                SetDlgItemText(dlg, IDC_LIGAND_LIST, "");
+                SetTextInCtrl(dlg, IDC_EDIT_NAME, "");
+                SetTextInCtrl(dlg, IDC_EDIT_VALENCE, "");
+                SetTextInCtrl(dlg, IDC_EDIT_H1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_H2, "");
+                SetTextInCtrl(dlg, IDC_EDIT_H3, "");
+                SetTextInCtrl(dlg, IDC_EDIT_H4, "");
+                SetTextInCtrl(dlg, IDC_EDIT_CA1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_MG1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_BA1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_CD1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_SR1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_MN1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_FE1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_CU1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_ZN1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DH1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DH2, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DH3, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DH4, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DCA1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DMG1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DBA1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DCD1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DSR1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DMN1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DFE1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DCU1, "");
+                SetTextInCtrl(dlg, IDC_EDIT_DZN1, "");
+            }
+            break;
         case IDC_SAVE_BTN:
             {
                 int index = SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_GETCURSEL, 0, 0);
-                SaveLigandData(dlg, index);
+                bool createNew = (g_ligandEditorMode == LigandEditorMode::Add) || (index < 0) || (index >= (int)g_editorLigands.size());
+
+                if (createNew) {
+                    Ligand newLigand;
+                    newLigand.name = GetTextFromCtrl(dlg, IDC_EDIT_NAME);
+                    if (newLigand.name.empty()) {
+                        MessageBox(dlg, "Ligand name is required.", "Validation", MB_ICONWARNING);
+                        break;
+                    }
+
+                    newLigand.valence = atoi(GetTextFromCtrl(dlg, IDC_EDIT_VALENCE).c_str());
+                    newLigand.constants.log_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H1).c_str());
+                    newLigand.constants.log_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H2).c_str());
+                    newLigand.constants.log_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H3).c_str());
+                    newLigand.constants.log_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H4).c_str());
+                    newLigand.constants.Ca1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CA1).c_str());
+                    newLigand.constants.Mg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MG1).c_str());
+                    newLigand.constants.Ba1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_BA1).c_str());
+                    newLigand.constants.Cd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CD1).c_str());
+                    newLigand.constants.Sr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_SR1).c_str());
+                    newLigand.constants.Mn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MN1).c_str());
+                    newLigand.constants.X1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_FE1).c_str());
+                    newLigand.constants.Cu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CU1).c_str());
+                    newLigand.constants.Zn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_ZN1).c_str());
+                    newLigand.constants.dlog_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH1).c_str());
+                    newLigand.constants.dlog_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH2).c_str());
+                    newLigand.constants.dlog_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH3).c_str());
+                    newLigand.constants.dlog_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH4).c_str());
+                    newLigand.constants.dCa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCA1).c_str());
+                    newLigand.constants.dMg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMG1).c_str());
+                    newLigand.constants.dBa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DBA1).c_str());
+                    newLigand.constants.dCd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCD1).c_str());
+                    newLigand.constants.dSr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DSR1).c_str());
+                    newLigand.constants.dMn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMN1).c_str());
+                    newLigand.constants.dX1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DFE1).c_str());
+                    newLigand.constants.dCu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCU1).c_str());
+                    newLigand.constants.dZn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DZN1).c_str());
+
+                    g_editorLigands.push_back(newLigand);
+                    g_solver.AddLigand(newLigand);
+                    LIGANDS.push_back(newLigand);
+                    PopulateLigandList(dlg);
+                    SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, g_editorLigands.size() - 1, 0);
+                    g_ligandEditorMode = LigandEditorMode::Edit;
+                } else {
+                    SaveLigandData(dlg, index);
+                }
+
                 SaveLigandsToFile();
+                InitializeAppData();
+                MessageBox(dlg, "Ligand saved successfully.", "Saved", MB_OK);
             }
             break;
         case IDC_CANCEL_BTN:
@@ -340,28 +428,37 @@ LRESULT CALLBACK LigandEditorProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPar
     return FALSE;
 }
 
-static void ShowLigandEditorDialog(HWND parent) {
+static bool ShowLigandEditorDialog(HWND parent) {
     // Register window class for ligand editor dialog
     static bool classRegistered = false;
     if (!classRegistered) {
-        WNDCLASSEX wc = {0};
+        WNDCLASSEXA wc = {0};
         wc.cbSize = sizeof(wc);
         wc.style = CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc = LigandEditorProc;
-        wc.hInstance = GetModuleHandle(NULL);
-        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hInstance = GetModuleHandleA(NULL);
+        wc.hCursor = LoadCursorA(NULL, IDC_ARROW);
         wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wc.lpszClassName = "LigandEditorDialog";
-        RegisterClassEx(&wc);
+        if (!RegisterClassExA(&wc)) {
+            MessageBoxA(NULL, "Failed to register LigandEditorDialog class.", "Error", MB_ICONERROR);
+            return false;
+        }
         classRegistered = true;
     }
     
-    // Create dialog window
-    HWND dlg = CreateWindowEx(WS_EX_DLGMODALFRAME, "LigandEditorDialog", "Ligand Editor", 
-                             WS_VISIBLE | WS_POPUP | WS_CAPTION | WS_SYSMENU,
-                             100, 100, 800, 600, parent, NULL, GetModuleHandle(NULL), NULL);
+    // Create dialog window (ANSI API for consistency)
+    HWND dlg = CreateWindowExA(WS_EX_DLGMODALFRAME, "LigandEditorDialog", "Ligand Editor", 
+                             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                             CW_USEDEFAULT, CW_USEDEFAULT, 860, 620, NULL, NULL, GetModuleHandleA(NULL), NULL);
     
-    if (!dlg) return;
+    if (!dlg) {
+        DWORD err = GetLastError();
+        char errMsg[256];
+        snprintf(errMsg, sizeof(errMsg), "Failed to create Ligand Editor window (error %lu).", err);
+        MessageBoxA(parent, errMsg, "Error", MB_ICONERROR);
+        return false;
+    }
     
     // Store dialog handle for message handling
     SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)parent);
@@ -459,13 +556,45 @@ static void ShowLigandEditorDialog(HWND parent) {
     y += 40;
     
     // Buttons
+    CreateWindow("BUTTON", "New Ligand", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 100, y, 80, 25, dlg, (HMENU)IDC_NEW_LIGAND_BTN, NULL, NULL);
     CreateWindow("BUTTON", "Save", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 200, y, 80, 25, dlg, (HMENU)IDC_SAVE_BTN, NULL, NULL);
     CreateWindow("BUTTON", "Cancel", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 300, y, 80, 25, dlg, (HMENU)IDC_CANCEL_BTN, NULL, NULL);
     
-    // Initialize dialog
+    // Initialize dialog data
     g_editorLigands = GetAllLigands();
     PopulateLigandList(dlg);
-    if (!g_editorLigands.empty()) {
+    if (g_ligandEditorMode == LigandEditorMode::Add) {
+        // New ligand route: clear fields and do not select an existing ligand
+        SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, -1, 0);
+        SetTextInCtrl(dlg, IDC_EDIT_NAME, "");
+        SetTextInCtrl(dlg, IDC_EDIT_VALENCE, "");
+        SetTextInCtrl(dlg, IDC_EDIT_H1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_H2, "");
+        SetTextInCtrl(dlg, IDC_EDIT_H3, "");
+        SetTextInCtrl(dlg, IDC_EDIT_H4, "");
+        SetTextInCtrl(dlg, IDC_EDIT_CA1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_MG1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_BA1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_CD1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_SR1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_MN1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_FE1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_CU1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_ZN1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DH1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DH2, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DH3, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DH4, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DCA1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DMG1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DBA1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DCD1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DSR1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DMN1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DFE1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DCU1, "");
+        SetTextInCtrl(dlg, IDC_EDIT_DZN1, "");
+    } else if (!g_editorLigands.empty()) {
         SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, 0, 0);
         LoadLigandData(dlg, 0);
     }
@@ -480,6 +609,8 @@ static void ShowLigandEditorDialog(HWND parent) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    return true;
 }
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -488,6 +619,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         // Menu
         HMENU hMenu = CreateMenu();
         HMENU hFile = CreatePopupMenu();
+        AppendMenu(hFile, MF_STRING, IDM_FILE_ADD_LIGAND, "Add Ligand...");
         AppendMenu(hFile, MF_STRING, IDM_LIGAND_EDITOR, "Ligand Editor");
         AppendMenu(hFile, MF_SEPARATOR, 0, NULL);
         AppendMenu(hFile, MF_STRING, IDM_FILE_EXIT, "Exit");
@@ -505,7 +637,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         CreateWindow("STATIC", "Solution Parameters:", WS_VISIBLE | WS_CHILD, 10, y, 150, 20, hwnd, NULL, NULL, NULL);
         y += 25;
         
-        CreateWindow("STATIC", "Temperature (°C):", WS_VISIBLE | WS_CHILD, 20, y, 120, 20, hwnd, NULL, NULL, NULL);
+        CreateWindow("STATIC", "Temperature (C):", WS_VISIBLE | WS_CHILD, 20, y, 120, 20, hwnd, NULL, NULL, NULL);
         CreateWindow("EDIT", "25.0", WS_VISIBLE | WS_CHILD | WS_BORDER, 150, y, 80, 20, hwnd, (HMENU)IDC_TEMP_INPUT, NULL, NULL);
         y += 25;
         
@@ -581,8 +713,17 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         case IDM_FILE_EXIT:
             PostQuitMessage(0);
             return 0;
+                case IDM_FILE_ADD_LIGAND:
+            g_ligandEditorMode = LigandEditorMode::Add;
+            if (!ShowLigandEditorDialog(hwnd)) {
+                MessageBox(hwnd, "Unable to open Ligand Editor.", "Error", MB_ICONERROR);
+            }
+            return 0;
         case IDM_LIGAND_EDITOR:
-            ShowLigandEditorDialog(hwnd);
+            g_ligandEditorMode = LigandEditorMode::Edit;
+            if (!ShowLigandEditorDialog(hwnd)) {
+                MessageBox(hwnd, "Unable to open Ligand Editor.", "Error", MB_ICONERROR);
+            }
             return 0;
         case IDM_HELP_ABOUT:
             MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
@@ -593,6 +734,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                 for (int i = 0; i < g_numCations; i++) {
                     SetDlgItemText(hwnd, IDC_CATION_FREE_BASE + i, "");
                     SetDlgItemText(hwnd, IDC_CATION_TOTAL_BASE + i, "");
+                    SendDlgItemMessage(hwnd, IDC_CATION_UNIT_BASE + i, CB_SETCURSEL, 1, 0); // default uM
+                    g_previousUnits[i] = 1;
+                }
+                for (int i = 0; i < g_numLigands; i++) {
+                    SendDlgItemMessage(hwnd, IDC_LIGAND_COMBO_BASE + i, CB_SETCURSEL, 0, 0);
+                    SetDlgItemText(hwnd, IDC_LIGAND_CONC_BASE + i, "");
                 }
                 SetOutputText(hwnd, "Ready. Configure ligands and solution parameters, then click Calculate.");
                 SetDlgItemText(hwnd, IDC_CALCULATE_BTN, "Calculate");
@@ -612,34 +759,34 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             g_solver.SetParameters(params);
 
             // Build result output
-            std::string output = "=== Equilibrium Calculation Results ===\n";
-            output += "\n";
-            output += "Solution Parameters:\n";
-            output += "------------------------\n";
+            std::string output = "=== Equilibrium Calculation Results ===\r\n";
+            output += "\r\n";
+            output += "Solution Parameters:\r\n";
+            output += "------------------------\r\n";
             char buf[128];
-            sprintf(buf, "  Temperature: %.1f °C\n", temp);
+            sprintf(buf, "  Temperature: %.1f C\r\n", temp);
             output += buf;
-            sprintf(buf, "  Ionic Strength: %.1f mM\n", ionic);
+            sprintf(buf, "  Ionic Strength: %.1f mM\r\n", ionic);
             output += buf;
-            sprintf(buf, "  pH: %.2f\n\n", pH);
+            sprintf(buf, "  pH: %.2f\r\n\r\n", pH);
             output += buf;
 
-            output += "Selected Ligands:\n";
-            output += "------------------------\n";
+            output += "Selected Ligands:\r\n";
+            output += "------------------------\r\n";
             for (int i = 0; i < g_numLigands; i++) {
                 int ligandIdx = SendDlgItemMessage(hwnd, IDC_LIGAND_COMBO_BASE + i, CB_GETCURSEL, 0, 0);
                 if (ligandIdx > 0) { // Skip <None>
                     char ligandName[128] = {0};
                     SendDlgItemMessage(hwnd, IDC_LIGAND_COMBO_BASE + i, CB_GETLBTEXT, ligandIdx, (LPARAM)ligandName);
                     double conc = GetDoubleFromCtrl(hwnd, IDC_LIGAND_CONC_BASE + i);
-                    sprintf(buf, "  %s: %.6f M\n", ligandName, conc / 1000.0);
+                    sprintf(buf, "  %s: %.6f M\r\n", ligandName, conc / 1000.0);
                     output += buf;
                 }
             }
-            output += "\n";
+            output += "\r\n";
 
-            output += "Cation Calculations:\n";
-            output += "------------------------\n\n";
+            output += "Cation Calculations:\r\n";
+            output += "------------------------\r\n\r\n";
 
             for (int i = 0; i < g_numCations; i++) {
                 double free = GetDoubleFromCtrl(hwnd, IDC_CATION_FREE_BASE + i);
@@ -673,13 +820,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                         // Update tracked unit (free was unchanged, but total is set)
                         g_previousUnits[i] = unit;
                         
-                        sprintf(buf, "%s:\n", g_cationNames[i]);
+                        sprintf(buf, "%s:\r\n", g_cationNames[i]);
                         output += buf;
-                        sprintf(buf, "  Free:    %.3e M\n", res.freeMetal);
+                        sprintf(buf, "  Free:    %.3e M\r\n", res.freeMetal);
                         output += buf;
-                        sprintf(buf, "  Total:   %.3e M (%.2f mM)\n", res.totalMetal, res.totalMetal * 1000.0);
+                        sprintf(buf, "  Total:   %.3e M (%.2f mM)\r\n", res.totalMetal, res.totalMetal * 1000.0);
                         output += buf;
-                        sprintf(buf, "  Complex: %.3e M\n\n", res.complex);
+                        sprintf(buf, "  Complex: %.3e M\r\n\r\n", res.complex);
                         output += buf;
                     }
                 } else if (total > 0) {
@@ -707,13 +854,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                         // Update tracked unit to the new best unit
                         g_previousUnits[i] = bestUnit;
                         
-                        sprintf(buf, "%s:\n", g_cationNames[i]);
+                        sprintf(buf, "%s:\r\n", g_cationNames[i]);
                         output += buf;
-                        sprintf(buf, "  Free:    %.3e M\n", res.freeMetal);
+                        sprintf(buf, "  Free:    %.3e M\r\n", res.freeMetal);
                         output += buf;
-                        sprintf(buf, "  Total:   %.3e M (%.2f mM)\n", res.totalMetal, res.totalMetal * 1000.0);
+                        sprintf(buf, "  Total:   %.3e M (%.2f mM)\r\n", res.totalMetal, res.totalMetal * 1000.0);
                         output += buf;
-                        sprintf(buf, "  Complex: %.3e M\n\n", res.complex);
+                        sprintf(buf, "  Complex: %.3e M\r\n\r\n", res.complex);
                         output += buf;
                     }
                 }

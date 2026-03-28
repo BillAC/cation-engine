@@ -36,14 +36,15 @@ int main() {
     
     std::cout << "=== Test Case 3: 5 mM BAPTA, pH 7.2 ===\n";
     std::cout << "Desired Free Ca2+ = 100 nM, Total Mg2+ = 1 mM\n";
-    auto result3 = solver.CalculateTotalToFree(5.0, 1.0, "BAPTA", "Mg2");
-    std::cout << "Free Mg2+: " << result3.freeMetal * 1e3 << " mM\n";
-    std::cout << "Expected: ~0.879 mM\n";
     
-    // For Ca2+ with BAPTA, we need to calculate what total Ca2+ gives 100 nM free
-    auto result4 = solver.CalculateFreeToTotal(5.0, 100e-9, "BAPTA", "Ca2");
-    std::cout << "Total Ca2+ for 100 nM free: " << result4.totalMetal * 1e3 << " mM\n";
-    std::cout << "Expected: ~2.18 mM\n";
+    // Use constrained multi-metal calculation
+    // Known: total Mg = 1 mM, target free Ca = 100 nM
+    // Find: total Ca needed, resulting free Mg
+    auto result3 = solver.CalculateConstrainedMulti(5.0, {1.0}, {"Mg2"}, 100e-9, "Ca2", "BAPTA");
+    
+    std::cout << "Total Ca2+ needed: " << result3.totalMetal * 1e3 << " mM\n";
+    std::cout << "Free Mg2+: " << result3.freeMetal * 1e3 << " mM\n";
+    std::cout << "Expected Total Ca: ~2.18 mM, Free Mg: ~0.879 mM\n";
     
     return 0;
 }

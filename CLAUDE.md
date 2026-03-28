@@ -31,6 +31,18 @@ Calculate free vs. total concentrations for divalent cations (Ca2+,	Mg2+,	Ba2+,	
 - **Chemistry:** Account for pH (protonation), ionic strength (Davies/Debye-Hückel), and temperature (Van 't Hoff) corrections.
 - **Data Source:** Ligand data and structures are managed via `ligands.csv`.
 
+## Implemented solver behavior (2026-03-28)
+- `CationSystem::calculateStabilityConstant(ligand, metalName)` now applies direct pH correction by multiplying K with protonation fraction `alpha` and returns `log10(K_eff)`.
+- `CationSystem::solveCoupledEquilibriumNewton(...)` solves n-metal + ligand mass balance with Jacobian + damping and falls back to bisection when unstable.
+- `CalculateTotalToFreeMulti(...)` uses the coupled solver plus fallback to robustly compute free Ligand/Metal states.
+- `CalculateConstrainedMulti(...)` now correctly handles case `knownTotalMetals` empty (target-only calculation) and competitive cases.
+
+## Updated test coverage
+- `test/SolverTest.cpp` now includes three regression scenarios:
+  1. EGTA/Ca free-from-total (10 mM EGTA, 5 mM Ca, pH 7.2)
+  2. EDTA/Mg total-from-free (10 mM EDTA, target free 1 mM Mg, pH 7.0)
+  3. BAPTA competitive constrained case (5 mM BAPTA, target free Ca 100 nM, 1 mM Mg total, pH 7.2)
+
 ## Directory Logic
 1. **Architecture:** Headers in `/include`, implementation in `/src`.
 2. **Legacy Reference:** Reference JavaScript (WebMaxC) and metadata in `legacy_code/`.

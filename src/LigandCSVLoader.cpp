@@ -43,6 +43,7 @@ const Ligand* GetLigandByName(const std::string& name) {
 
 // Function to load ligand data from CSV file
 void LoadLigandDataFromCSV(const std::string& filename) {
+    LIGANDS.clear();
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: Could not open ligand data file: " << filename << std::endl;

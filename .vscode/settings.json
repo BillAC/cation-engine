@@ -7,6 +7,8 @@
         "./debug_protonation": true,
         "./debug_calculation": true,
         "./debug_calculation2": true,
-        "./debug_no_ionic": true
+        "./debug_no_ionic": true,
+        "cmake": true,
+        "./cation_engine_test": true
     }
 }

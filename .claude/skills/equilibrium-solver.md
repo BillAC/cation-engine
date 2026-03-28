@@ -8,3 +8,5 @@
   $log K_{adj} = log K_{0} + \Delta log \gamma$
 - **Iterative Logic:** Use the "Bounding" method described (Binary search or Newton-Raphson with safety bounds) to ensure convergence even at nanomolar scales.
 - **Multidimensional Solving:** Implement simultaneous mass-balance for $n$ cations and $m$ ligands using a Jacobian-based Newton method or the bounding matrix approach.
+- **Current Engine Behavior:** Uses `CationSystem::solveCoupledEquilibriumNewton` (n+1 variable Jacobian with semi-damped updates) and falls back to bisection when unstable.
+- **pH Correction:** `calculateStabilityConstant(ligand, metal)` now applies multi-step protonation fraction (alpha) as direct K adjustment, avoiding double corrections in caller functions.
