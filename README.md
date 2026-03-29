@@ -18,8 +18,8 @@
     *   **pH Correction:** Automatic adjustment via multi-step ligand protonation fractions ($H_1$ through $H_4$).
     *   **Temperature Correction:** Thermodynamic adjustments using the Van 't Hoff equation and validated Enthalpy ($\Delta H$) data.
     *   **Ionic Strength:** Correction via the Davies equation for experimental accuracy in non-ideal solutions.
-*   **7-Cation Matrix:** Native support for $Ca^{2+}$, $Mg^{2+}$, $Ba^{2+}$, $Cd^{2+}$, $Sr^{2+}$, $Mn^{2+}$, and a custom cation "X".
-*   **Integrated Ligand Editor:** Manage and backup your constant database directly within the GUI.
+*   **8-Cation Matrix:** Native support for $Ca^{2+}$, $Mg^{2+}$, $Ba^{2+}$, $Cd^{2+}$, $Sr^{2+}$, $Mn^{2+}$, $Fe-II^{2+}$, and $Zn^{2+}$. 
+*   **Integrated Ligand Editor:** Manage and backup your constant database directly within the GUI. New ligands can be added. 
 
 ---
 
