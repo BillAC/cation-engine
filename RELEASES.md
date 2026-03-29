@@ -1,12 +1,19 @@
 # Releases
 
-## v1.0.0 (Latest) - 2026-03-28
+The latest official releases of the Cation-Ligand Equilibrium Engine can be found on our GitHub Releases page:
+
+### 🔗 [View All Releases](https://github.com/BillAC/cation-engine/releases)
+
+---
+
+## v1.0.0 Stable - 2026-03-28
 
 ### 🚀 High-Precision Cation Equilibrium Solver
 
-This is the first stable release of the Cation-Ligand Equilibrium Engine. This version marks the transition from alpha to a fully verified scientific tool capable of handling multi-ligand, multi-cation scenarios with high precision.
+This version marks the transition from alpha to a fully verified scientific tool capable of handling multi-ligand, multi-cation scenarios with high precision.
 
-#### [Download cation_engine.exe (Windows 10/11)](https://github.com/BillAC/cation-engine/releases/download/v1.0.0/cation_engine.exe)
+#### [Download cation-engine-v1.0.0-win64.zip](https://github.com/BillAC/cation-engine/releases/download/v1.0.0/cation-engine-v1.0.0-win64.zip)
+*(Includes: cation_engine.exe, ligands.csv, and documentation)*
 
 ---
 

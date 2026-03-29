@@ -1,0 +1,38 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Build Application
+        run: |
+          chmod +x ./build_windows.sh
+          ./build_windows.sh
+
+      - name: Package Release
+        run: |
+          zip cation-engine-${{ github.ref_name }}-win64.zip cation_engine.exe ligands.csv README.md LICENSE
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cation-engine-${{ github.ref_name }}-win64.zip
+          body_path: RELEASES.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
