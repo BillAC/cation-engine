@@ -730,7 +730,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             ShellExecute(NULL, "open", "https://n-hatada.github.io/stability-constant-explorer/english.html", NULL, NULL, SW_SHOWNORMAL);
             return 0;
         case IDM_HELP_ABOUT:
-            MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
+            MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.0.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
             return 0;
         case IDC_CALCULATE_BTN: {
             if (g_calculationDone) {
@@ -929,7 +929,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         return 1;
     }
 
-    HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Cation-Ligand Equilibrium Engine v1.0", 
+    HWND hwnd = CreateWindowEx(0, CLASS_NAME, "Cation-Ligand Equilibrium Engine v1.0.0", 
                               WS_OVERLAPPEDWINDOW | WS_VSCROLL,
                               CW_USEDEFAULT, CW_USEDEFAULT, 500, 800, NULL, NULL, hInstance, NULL);
     if (!hwnd) {

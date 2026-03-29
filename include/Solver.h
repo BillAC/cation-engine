@@ -135,6 +135,24 @@ public:
                                                const std::string& targetMetalName,
                                                const std::string& ligandName);
 
+    // Multi-ligand multi-metal simultaneous equilibrium solver
+    struct MultiSpeciesResult {
+        std::vector<std::string> ligandNames;
+        std::vector<std::string> metalNames;
+        std::vector<double> freeLigands;
+        std::vector<double> freeMetals;
+        std::vector<double> totalLigands;
+        std::vector<double> totalMetals;
+        std::vector<std::vector<double>> complexes; // [ligand_idx][metal_idx]
+        bool converged;
+    };
+
+    MultiSpeciesResult CalculateSimultaneousEquilibrium(
+        const std::vector<std::string>& ligandNames,
+        const std::vector<double>& totalLigands,
+        const std::vector<std::string>& metalNames,
+        const std::vector<double>& totalMetals);
+
     // Calculate equilibrium concentrations (both directions)
     EquilibriumResult CalculateEquilibrium(double totalLigand, double totalMetal,
                                          const std::string& ligandName, const std::string& metalName);
