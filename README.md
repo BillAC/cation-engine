@@ -82,7 +82,7 @@ The **Cation-Ligand Equilibrium Engine** is built upon decades of scientific res
     *   **CaBuf:** CaBuf, developed by G. Droogmans at KU Leuven, a classic tool used to calculate free calcium concentrations in solutions containing chelators (like EGTA or BAPTA) for electrophysiology and biochemical experiments
 
 ### Scientific Foundations
-*   **Iterative Bounding Method:** The core solver architecture is based on the iterative method for computing free ion concentrations in competitive binding environments.
+*   **Iterative Bounding Method:** The core solver architecture is based on the iterative method for computing free ion concentrations in competitive binding environments. See [PHYSICS.md](PHYSICS.md) for a detailed mathematical derivation.
 *   **Data Sources:** Stability constants and enthalpy data are derived from:
     *   **NIST Standard Reference Database 46** (Critically Selected Stability Constants of Metal Complexes).
     *   **IUPAC Stability Constants Database**.

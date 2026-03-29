@@ -1,0 +1,36 @@
+# Private Notes
+PRIVATE_NOTES.md
+
+# Build Artifacts
+*.o
+*.exe
+build_windows.log
+src/CMakeCache.txt
+src/CMakeFiles/
+src/Makefile
+src/cmake_install.cmake
+src/bin/
+
+# Compiled Binaries
+test_calculations
+test_comprehensive
+cation_engine_main
+cation_engine_test
+test_ligand_loading
+test_solver
+test_calc
+test_calculations
+test_comprehensive
+
+# Build Directories
+build/
+build_win/
+build-win/
+windows_build/
+
+# IDE & OS Files
+.vscode/
+.DS_Store
+
+# Archives
+*.zip
