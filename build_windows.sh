@@ -4,7 +4,8 @@
 
 echo "Building Windows executable in $(pwd)..."
 
-# Create build directory
+# Create clean build directory
+rm -rf build-win
 mkdir -p build-win
 cd build-win
 
