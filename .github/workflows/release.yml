@@ -28,13 +28,23 @@ jobs:
 
       - name: Package Release
         run: |
-          zip cation-engine-${{ github.ref_name }}-win64.zip cation_engine.exe ligands.csv README.md LICENSE
+          zip cation-engine-${{ github.ref_name }}-win64.zip cation_engine.exe ligands.csv metals.csv README.md LICENSE
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: cation-engine-${{ github.ref_name }}-win64.zip
-          body_path: RELEASES.md
+          body: |
+            ## CLEE v1.1.0 - Scientific Realignment Release
+            
+            This release introduces major scientific upgrades and structural refactoring.
+            
+            ### Key Changes:
+            - **WebMaxC Synchronization:** Bit-for-bit accuracy with NIST v8 benchmarks.
+            - **Industry Standard Mode:** Added Davies Equation and Hydroxide speciation.
+            - **Multi-Ligand Solver:** Full simultaneous competitive binding support.
+            - **Refactored Codebase:** Consolidated source files in `src/`.
+            - **UI Fixes:** Restored "Total from Free" lookup and added a Reset button.
           draft: false
           prerelease: false
         env:
