@@ -1,33 +1,26 @@
 #!/bin/bash
-set -euo pipefail
 
-# Path variables
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OUT="$ROOT/cation_engine.exe"
-BUILD_LOG="$ROOT/build_windows.log"
+# Build script for Windows using MinGW cross-compiler
 
-echo "Building Windows executable in $ROOT..."
-echo "Command log: $BUILD_LOG"
+echo "Building Windows executable in $(pwd)..."
 
-# Optional clean
-if [ "$#" -gt 0 ] && [ "$1" = "clean" ]; then
-  echo "Cleaning previous build output..."
-  rm -f "$OUT" "$BUILD_LOG"
-  echo "Clean done."
-  exit 0
-fi
+# Create build directory
+mkdir -p build-win
+cd build-win
 
-cd "$ROOT"
+# Run cmake with MinGW toolchain
+cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-mingw.cmake -DCMAKE_BUILD_TYPE=Release ..
 
-x86_64-w64-mingw32-g++ -I./include src/*.cpp main.cpp -o "$OUT" \
-  -static-libgcc -static-libstdc++ -static -lpthread \
-  -luser32 -lgdi32 -lcomctl32 -lcomdlg32 \
-  2>&1 | tee "$BUILD_LOG"
+# Build the project
+make -j$(nproc)
 
-echo "Build finished."
-if [ -f "$OUT" ]; then
-  echo "Created $OUT"
+# Check if build was successful
+if [ $? -eq 0 ]; then
+    echo "Build successful!"
+    cd ..
+    cp build-win/bin/cation_engine_main.exe cation_engine.exe
+    echo "Created cation_engine.exe"
 else
-  echo "Build failed: executable not found"
-  exit 1
+    echo "Build failed!"
+    exit 1
 fi

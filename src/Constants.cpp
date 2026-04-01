@@ -63,3 +63,26 @@ double GetAtomicWeight(CationType type) {
         default: return 0.0;
     }
 }
+
+#include <map>
+
+const HydroxideConstants* GetHydroxideConstants(const std::string& metalName) {
+    // Standard values from NIST Critical Stability Constants (SRD 46) at 25C, I=0
+    static const std::map<std::string, HydroxideConstants> MOH_DB = {
+        {"Ca2", {1.3, 0.0}},    // Ca + OH <-> CaOH+
+        {"Mg2", {2.58, 3.0}},   // Mg + OH <-> MgOH+
+        {"Ba2", {0.64, 0.0}},
+        {"Cd2", {3.9, 0.0}},
+        {"Sr2", {0.82, 0.0}},
+        {"Mn2", {3.4, 0.0}},
+        {"X1",  {0.0, 0.0}},
+        {"Cu2", {6.3, 0.0}},
+        {"Zn2", {5.0, 0.0}}
+    };
+
+    auto it = MOH_DB.find(metalName);
+    if (it != MOH_DB.end()) {
+        return &(it->second);
+    }
+    return nullptr;
+}

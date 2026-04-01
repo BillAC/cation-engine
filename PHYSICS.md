@@ -1,61 +1,69 @@
-# Scientific Basis: Cation-Ligand Equilibrium Equations
+# Scientific Basis: Cation-Ligand Equilibrium Engine (CLEE)
 
-This document describes the mathematical derivation of the solver used in the **Cation-Ligand Equilibrium Engine**. The engine solves for the equilibrium state of a system containing multiple metals ($M_1, M_2, ... M_n$) and multiple ligands ($L_1, L_2, ... L_m$).
+This document describes the mathematical and physical foundations of the **Cation-Ligand Equilibrium Engine**. The engine supports two distinct physical models to accommodate both legacy compatibility and modern thermodynamic rigor.
 
-## 1. Fundamental Equations
+## 1. Fundamental Equilibrium Equations
 
-For each metal $j$ and ligand $i$ forming a 1:1 complex $C_{ij}$:
-$$C_{ij} = K_{ij} \cdot [L_{f,i}] \cdot [M_{f,j}]$$
+The system solves for the equilibrium state of multiple metals ($M_j$) and multiple ligands ($L_i$). The engine accounts for three primary species for every ligand-metal pair:
 
-Where:
-- $[L_{f,i}]$ is the free concentration of ligand $i$.
-- $[M_{f,j}]$ is the free concentration of metal $j$.
-- $K_{ij}$ is the effective stability constant (adjusted for pH, temperature, and ionic strength).
+1.  **ML Complex:** $M + L \rightleftharpoons ML$
+    $$[ML] = K_{ML} \cdot [M_f] \cdot [L_f]$$
+2.  **MHL Complex:** $M + H + L \rightleftharpoons MHL$
+    $$[MHL] = K_{MHL} \cdot K_{H1} \cdot [H] \cdot [M_f] \cdot [L_f]$$
+3.  **MOH Complex (Hydroxide):** $M + OH \rightleftharpoons MOH$
+    $$[MOH] = K_{MOH} \cdot [M_f] \cdot [OH]$$
+
+Where $[L_f]$ is the concentration of the **fully deprotonated** ligand species.
 
 ### Mass Balance Constraints
-The system must satisfy the conservation of mass for every species:
+The solver must satisfy conservation of mass for all components:
 
-**Metal Mass Balance ($f_{M,j}$):**
-$$f_{M,j} = [M_{total,j}] - [M_{f,j}] - \sum_{i=1}^{m} C_{ij} = 0$$
+**Metal Mass Balance ($Mt_j$):**
+$$Mt_j = [M_{f,j}] + \sum_{i} ([ML_{ij}] + [MHL_{ij}]) + [MOH_j]$$
 
-**Ligand Mass Balance ($f_{L,i}$):**
-$$f_{L,i} = [L_{total,i}] - [L_{f,i}] - \sum_{j=1}^{n} C_{ij} = 0$$
+**Ligand Mass Balance ($Lt_i$):**
+$$Lt_i = [L_{f,i}] \cdot ZSumL_i + \sum_{j} ([ML_{ij}] + [MHL_{ij}])$$
 
-## 2. Newton-Raphson Derivation
+**Protonation Sum ($ZSumL$):**
+Accounts for all protonated states of the free ligand ($HL, H_2L, H_3L, H_4L$):
+$$ZSumL = 1 + \sum_{n=1}^{4} \left( [H]^n \cdot \prod_{k=1}^{n} K_{H,k} \right)$$
 
-To solve this system of $n + m$ nonlinear equations, we use the Newton-Raphson method. We define a vector of functions $\mathbf{F}(\mathbf{x}) = 0$, where $\mathbf{x}$ contains the free concentrations:
-$$\mathbf{x} = [[L_{f,1}], ..., [L_{f,m}], [M_{f,1}], ..., [M_{f,n}]]^T$$
+---
 
-The iteration step is:
-$$\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{J}^{-1} \mathbf{F}(\mathbf{x}_k)$$
+## 2. Solver Modes
 
-### The Jacobian Matrix ($\mathbf{J}$)
+### A. WebMaxC Legacy Mode (NIST v8)
+This mode provides bit-for-bit mathematical mimicry of the original MaxChelator logic.
 
-The Jacobian is the matrix of partial derivatives of the mass-balance functions with respect to the free concentrations.
+*   **Valence counting ($VaC$):** Charges for ionic strength correction are determined by the count of non-zero hydrogen constants in the database, rather than the physical valence.
+*   **Empirical Activity ($TH$):** Uses a specific empirical correction factor ($TH$) to convert $pH$ to $[H^+]$ concentration:
+    $$B = 0.5229 \cdot e^{0.0327 \cdot T} + 4.0159$$
+    $$TH = 0.145 \cdot e^{-B \cdot I} + 0.0635 \cdot e^{-43.97 \cdot I} + 0.6956$$
+*   **Dielectric Correction:** Uses a temperature-dependent polynomial for the dielectric constant of water to calculate $L_f$ activity factors.
+*   **Speciation:** Limited to $ML$ and $MHL$.
 
-#### For Ligand Equations ($f_{L,i}$):
-1. **With respect to its own free concentration ($L_{f,i}$):**
-   $$\frac{\partial f_{L,i}}{\partial [L_{f,i}]} = -1 - \sum_{j=1}^{n} K_{ij} [M_{f,j}]$$
-2. **With respect to another ligand ($L_{f,k}$):**
-   $$\frac{\partial f_{L,i}}{\partial [L_{f,k}]} = 0 \quad (i \neq k)$$
-3. **With respect to a metal ($M_{f,j}$):**
-   $$\frac{\partial f_{L,i}}{\partial [M_{f,j}]} = -K_{ij} [L_{f,i}]$$
+### B. Industry Standard Mode (Davies)
+A rigorous thermodynamic model aligned with generalized geochemical frameworks (e.g., PHREEQC).
 
-#### For Metal Equations ($f_{M,j}$):
-1. **With respect to its own free concentration ($M_{f,j}$):**
-   $$\frac{\partial f_{M,j}}{\partial [M_{f,j}]} = -1 - \sum_{i=1}^{m} K_{ij} [L_{f,i}]$$
-2. **With respect to another metal ($M_{f,k}$):**
-   $$\frac{\partial f_{M,j}}{\partial [M_{f,k}]} = 0 \quad (j \neq k)$$
-3. **With respect to a ligand ($L_{f,i}$):**
-   $$\frac{\partial f_{M,j}}{\partial [L_{f,i}]} = -K_{ij} [M_{f,j}]$$
+*   **Activity Coefficients:** Uses the **Davies Equation** ($I \leq 0.5 M$):
+    $$\log_{10} \gamma_i = -A \cdot Z_i^2 \left( \frac{\sqrt{I}}{1 + \sqrt{I}} - 0.3 I \right)$$
+*   **Water Speciation:** Calculates $pK_w$ dynamically using the **Marshall-Franck** equation.
+*   **Global Competition:** Automatically includes **Metal-Hydroxide ($MOH$)** speciation for all metals, which is critical for accurate results in neutral/alkaline solutions.
+*   **Rigorous Van 't Hoff:** Uses the exact exponential form for temperature adjustments.
 
-## 3. Implementation Details
+---
 
-In `src/Solver.cpp`, the matrix is constructed as follows (for the multi-species case):
+## 3. Numerical Implementation
 
-- Diagonal elements $(i,i)$ for ligands: `-1.0 - sum(K_ij * M_f,j)`
-- Diagonal elements $(m+j, m+j)$ for metals: `-1.0 - sum(K_ij * L_f,i)`
-- Off-diagonal elements $(i, m+j)$: `-K_ij * L_f,i`
-- Off-diagonal elements $(m+j, i)$: `-K_ij * M_f,j`
+### Newton-Raphson Solver
+The engine solves the system of $N+M$ non-linear equations using a damped Newton-Raphson method. The Jacobian matrix ($\mathbf{J}$) is constructed from the partial derivatives of the mass-balance functions:
 
-The solver uses Gaussian elimination with partial pivoting to solve the linear system $\mathbf{J} \Delta \mathbf{x} = \mathbf{F}$ at each step, with a damping factor to ensure stability in highly non-linear regions (e.g., near-zero free concentrations).
+$$J_{ii} = \frac{\partial f_i}{\partial x_i}, \quad J_{ij} = \frac{\partial f_i}{\partial x_j}$$
+
+The solver uses Gaussian elimination with partial pivoting to compute the correction vector $\Delta \mathbf{x}$ at each step until a tolerance of $10^{-12}$ is reached.
+
+### WebMaxC Iterative Solver
+For Legacy Mode, the engine also supports the "successive approximation" method used in the original MaxChelator:
+$$[L_f]_{next} = \frac{Lt}{ZSumL + \sum (K_{app} \cdot [M_f])}$$
+$$[M_f]_{next} = \frac{Mt}{1 + \sum (K_{app} \cdot [L_f])}$$
+This method is stable but slower to converge than Newton-Raphson.
