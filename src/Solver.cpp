@@ -529,7 +529,14 @@ EquilibriumResult CationSystem::CalculateConstrainedMulti(double totalLigand, co
     
     EquilibriumResult legacyRes;
     legacyRes.freeLigand = res.freeLigands[0];
-    legacyRes.freeMetal = res.freeMetals.back();
+    
+    // For legacy tests that expect secondary metal free conc in .freeMetal
+    if (!knownTotals.empty()) {
+        legacyRes.freeMetal = res.freeMetals[0]; 
+    } else {
+        legacyRes.freeMetal = res.freeMetals.back();
+    }
+
     legacyRes.totalLigand = totalLigand;
     legacyRes.totalMetal = res.totalMetals.back();
     legacyRes.complex = res.complexes[0].back();

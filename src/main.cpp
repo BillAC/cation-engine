@@ -776,7 +776,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             return 0;
         }
         case IDM_HELP_ABOUT:
-            MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.0.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
+            MessageBox(hwnd, "Cation-Ligand Equilibrium Engine v1.1.0\n\nCalculates free and total ion concentrations\nin complexing solutions.", "About", MB_ICONINFORMATION);
             return 0;
         case IDC_RESET_BTN:
             SendMessage(hwnd, WM_COMMAND, IDM_FILE_NEW, 0);
