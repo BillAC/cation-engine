@@ -24,7 +24,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define IDM_FILE_EXIT 40001
 #define IDM_LIGAND_EDITOR 40002
-#define IDM_FILE_ADD_LIGAND 40004
 #define IDM_HELP_ABOUT 40003
 #define IDM_FILE_NEW 40005
 #define IDM_HELP_CONSTANTS 40006
@@ -59,9 +58,6 @@ static const int g_numLigands = 10;
 static CationSystem g_solver;
 static int g_previousUnits[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}; // Track previous unit for each cation (default uM)
 static bool g_calculationDone = false; // Track if calculation has been performed
-
-enum class LigandEditorMode { Add, Edit };
-static LigandEditorMode g_ligandEditorMode = LigandEditorMode::Edit;
 
 static void InitializeAppData() {
     InitializeLigandData();
@@ -104,29 +100,22 @@ static double GetDoubleFromCtrl(HWND parent, int ctrlId) {
     return atof(GetTextFromCtrl(parent, ctrlId).c_str());
 }
 
-// Helper: Convert concentration between units (0=nM, 1=uM, 2=mM)
-// Returns raw value in target unit
 static double ConvertConcentration(double valueMolar, int targetUnit) {
     switch (targetUnit) {
-    case 0: return valueMolar * 1e9;   // M to nM
-    case 1: return valueMolar * 1e6;   // M to uM
-    case 2: return valueMolar * 1e3;   // M to mM
+    case 0: return valueMolar * 1e9;
+    case 1: return valueMolar * 1e6;
+    case 2: return valueMolar * 1e3;
     }
     return valueMolar;
 }
 
-// Helper: Determine best unit for displaying a concentration (in Molar)
-// Returns 0=nM, 1=uM, 2=mM based on what looks best
 static int DetermineBestUnit(double valueMolar) {
-    if (valueMolar <= 0) return 1; // Default to uM for zero/invalid
-    
+    if (valueMolar <= 0) return 1;
     double nM = valueMolar * 1e9;
     double uM = valueMolar * 1e6;
-    
-    // Pick the unit that gives a value between 1 and 999
-    if (nM >= 1 && nM < 1000) return 0; // nM
-    if (uM >= 1 && uM < 1000) return 1; // uM
-    return 2; // mM
+    if (nM >= 1 && nM < 1000) return 0;
+    if (uM >= 1 && uM < 1000) return 1;
+    return 2;
 }
 
 static void PopulateCombo(HWND parent, int ctrlId, const std::vector<std::string>& items) {
@@ -140,7 +129,6 @@ static void PopulateCombo(HWND parent, int ctrlId, const std::vector<std::string
     SendMessage(combo, CB_SETCURSEL, 0, 0);
 }
 
-// Ligand Editor Dialog (Helper same as before)
 #define IDC_LIGAND_LIST 60001
 #define IDC_EDIT_NAME 60002
 #define IDC_EDIT_VALENCE 60003
@@ -172,7 +160,6 @@ static void PopulateCombo(HWND parent, int ctrlId, const std::vector<std::string
 #define IDC_EDIT_DZN1 60029
 #define IDC_SAVE_BTN 60030
 #define IDC_CANCEL_BTN 60031
-#define IDC_NEW_LIGAND_BTN 60032
 
 static std::vector<Ligand> g_editorLigands;
 
@@ -190,66 +177,38 @@ static void LoadLigandData(HWND dlg, int index) {
     const Ligand& ligand = g_editorLigands[index];
     SetTextInCtrl(dlg, IDC_EDIT_NAME, ligand.name.c_str());
     char buf[32];
-    sprintf(buf, "%d", ligand.valence);
-    SetTextInCtrl(dlg, IDC_EDIT_VALENCE, buf);
-    sprintf(buf, "%.2f", ligand.constants.log_K1);
-    SetTextInCtrl(dlg, IDC_EDIT_H1, buf);
-    sprintf(buf, "%.2f", ligand.constants.log_K2);
-    SetTextInCtrl(dlg, IDC_EDIT_H2, buf);
-    sprintf(buf, "%.2f", ligand.constants.log_K3);
-    SetTextInCtrl(dlg, IDC_EDIT_H3, buf);
-    sprintf(buf, "%.2f", ligand.constants.log_K4);
-    SetTextInCtrl(dlg, IDC_EDIT_H4, buf);
-    sprintf(buf, "%.2f", ligand.constants.Ca1);
-    SetTextInCtrl(dlg, IDC_EDIT_CA1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Mg1);
-    SetTextInCtrl(dlg, IDC_EDIT_MG1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Ba1);
-    SetTextInCtrl(dlg, IDC_EDIT_BA1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Cd1);
-    SetTextInCtrl(dlg, IDC_EDIT_CD1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Sr1);
-    SetTextInCtrl(dlg, IDC_EDIT_SR1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Mn1);
-    SetTextInCtrl(dlg, IDC_EDIT_MN1, buf);
-    sprintf(buf, "%.2f", ligand.constants.X1);
-    SetTextInCtrl(dlg, IDC_EDIT_FE1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Cu1);
-    SetTextInCtrl(dlg, IDC_EDIT_CU1, buf);
-    sprintf(buf, "%.2f", ligand.constants.Zn1);
-    SetTextInCtrl(dlg, IDC_EDIT_ZN1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dlog_K1);
-    SetTextInCtrl(dlg, IDC_EDIT_DH1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dlog_K2);
-    SetTextInCtrl(dlg, IDC_EDIT_DH2, buf);
-    sprintf(buf, "%.1f", ligand.constants.dlog_K3);
-    SetTextInCtrl(dlg, IDC_EDIT_DH3, buf);
-    sprintf(buf, "%.1f", ligand.constants.dlog_K4);
-    SetTextInCtrl(dlg, IDC_EDIT_DH4, buf);
-    sprintf(buf, "%.1f", ligand.constants.dCa1);
-    SetTextInCtrl(dlg, IDC_EDIT_DCA1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dMg1);
-    SetTextInCtrl(dlg, IDC_EDIT_DMG1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dBa1);
-    SetTextInCtrl(dlg, IDC_EDIT_DBA1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dCd1);
-    SetTextInCtrl(dlg, IDC_EDIT_DCD1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dSr1);
-    SetTextInCtrl(dlg, IDC_EDIT_DSR1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dMn1);
-    SetTextInCtrl(dlg, IDC_EDIT_DMN1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dX1);
-    SetTextInCtrl(dlg, IDC_EDIT_DFE1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dCu1);
-    SetTextInCtrl(dlg, IDC_EDIT_DCU1, buf);
-    sprintf(buf, "%.1f", ligand.constants.dZn1);
-    SetTextInCtrl(dlg, IDC_EDIT_DZN1, buf);
+    sprintf(buf, "%d", ligand.valence); SetTextInCtrl(dlg, IDC_EDIT_VALENCE, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K1); SetTextInCtrl(dlg, IDC_EDIT_H1, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K2); SetTextInCtrl(dlg, IDC_EDIT_H2, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K3); SetTextInCtrl(dlg, IDC_EDIT_H3, buf);
+    sprintf(buf, "%.2f", ligand.constants.log_K4); SetTextInCtrl(dlg, IDC_EDIT_H4, buf);
+    sprintf(buf, "%.2f", ligand.constants.Ca1); SetTextInCtrl(dlg, IDC_EDIT_CA1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Mg1); SetTextInCtrl(dlg, IDC_EDIT_MG1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Ba1); SetTextInCtrl(dlg, IDC_EDIT_BA1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Cd1); SetTextInCtrl(dlg, IDC_EDIT_CD1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Sr1); SetTextInCtrl(dlg, IDC_EDIT_SR1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Mn1); SetTextInCtrl(dlg, IDC_EDIT_MN1, buf);
+    sprintf(buf, "%.2f", ligand.constants.X1); SetTextInCtrl(dlg, IDC_EDIT_FE1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Cu1); SetTextInCtrl(dlg, IDC_EDIT_CU1, buf);
+    sprintf(buf, "%.2f", ligand.constants.Zn1); SetTextInCtrl(dlg, IDC_EDIT_ZN1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K1); SetTextInCtrl(dlg, IDC_EDIT_DH1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K2); SetTextInCtrl(dlg, IDC_EDIT_DH2, buf);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K3); SetTextInCtrl(dlg, IDC_EDIT_DH3, buf);
+    sprintf(buf, "%.1f", ligand.constants.dlog_K4); SetTextInCtrl(dlg, IDC_EDIT_DH4, buf);
+    sprintf(buf, "%.1f", ligand.constants.dCa1); SetTextInCtrl(dlg, IDC_EDIT_DCA1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dMg1); SetTextInCtrl(dlg, IDC_EDIT_DMG1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dBa1); SetTextInCtrl(dlg, IDC_EDIT_DBA1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dCd1); SetTextInCtrl(dlg, IDC_EDIT_DCD1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dSr1); SetTextInCtrl(dlg, IDC_EDIT_DSR1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dMn1); SetTextInCtrl(dlg, IDC_EDIT_DMN1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dX1); SetTextInCtrl(dlg, IDC_EDIT_DFE1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dCu1); SetTextInCtrl(dlg, IDC_EDIT_DCU1, buf);
+    sprintf(buf, "%.1f", ligand.constants.dZn1); SetTextInCtrl(dlg, IDC_EDIT_DZN1, buf);
 }
 
 static void SaveLigandData(HWND dlg, int index) {
     if (index < 0 || index >= (int)g_editorLigands.size()) return;
     Ligand& ligand = g_editorLigands[index];
-    ligand.name = GetTextFromCtrl(dlg, IDC_EDIT_NAME);
     ligand.valence = atoi(GetTextFromCtrl(dlg, IDC_EDIT_VALENCE).c_str());
     ligand.constants.log_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H1).c_str());
     ligand.constants.log_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H2).c_str());
@@ -307,146 +266,93 @@ LRESULT CALLBACK LigandEditorProc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lPar
     switch (msg) {
     case WM_CREATE: {
         int y = 10;
-        CreateWindow("STATIC", "Ligands:", WS_VISIBLE | WS_CHILD, 10, y, 100, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("STATIC", "Ligands (Database):", WS_VISIBLE | WS_CHILD, 10, y, 150, 20, dlg, NULL, NULL, NULL);
         y += 25;
-        CreateWindow("LISTBOX", "", WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_NOTIFY | WS_VSCROLL, 10, y, 150, 400, dlg, (HMENU)IDC_LIGAND_LIST, NULL, NULL);
+        CreateWindow("LISTBOX", "", WS_VISIBLE | WS_CHILD | WS_BORDER | LBS_NOTIFY | WS_VSCROLL, 10, y, 150, 450, dlg, (HMENU)IDC_LIGAND_LIST, NULL, NULL);
         int x = 180; y = 10;
         CreateWindow("STATIC", "Name:", WS_VISIBLE | WS_CHILD, x, y, 50, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+60, y, 100, 20, dlg, (HMENU)IDC_EDIT_NAME, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, x+60, y, 150, 20, dlg, (HMENU)IDC_EDIT_NAME, NULL, NULL);
         y += 30;
-        CreateWindow("STATIC", "Valence:", WS_VISIBLE | WS_CHILD, x, y, 50, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+60, y, 100, 20, dlg, (HMENU)IDC_EDIT_VALENCE, NULL, NULL);
+        CreateWindow("STATIC", "Valence:", WS_VISIBLE | WS_CHILD, x, y, 60, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+70, y, 60, 20, dlg, (HMENU)IDC_EDIT_VALENCE, NULL, NULL);
         y += 30;
-        CreateWindow("STATIC", "H1 (pKa1):", WS_VISIBLE | WS_CHILD, x, y, 60, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+70, y, 60, 20, dlg, (HMENU)IDC_EDIT_H1, NULL, NULL);
-        CreateWindow("STATIC", "H2 (pKa2):", WS_VISIBLE | WS_CHILD, x+140, y, 60, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+210, y, 60, 20, dlg, (HMENU)IDC_EDIT_H2, NULL, NULL);
+        CreateWindow("STATIC", "H1 (pKa1):", WS_VISIBLE | WS_CHILD, x, y, 70, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+80, y, 60, 20, dlg, (HMENU)IDC_EDIT_H1, NULL, NULL);
+        CreateWindow("STATIC", "H2 (pKa2):", WS_VISIBLE | WS_CHILD, x+160, y, 70, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+240, y, 60, 20, dlg, (HMENU)IDC_EDIT_H2, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "H3 (pKa3):", WS_VISIBLE | WS_CHILD, x, y, 60, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+70, y, 60, 20, dlg, (HMENU)IDC_EDIT_H3, NULL, NULL);
-        CreateWindow("STATIC", "H4 (pKa4):", WS_VISIBLE | WS_CHILD, x+140, y, 60, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+210, y, 60, 20, dlg, (HMENU)IDC_EDIT_H4, NULL, NULL);
+        CreateWindow("STATIC", "H3 (pKa3):", WS_VISIBLE | WS_CHILD, x, y, 70, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+80, y, 60, 20, dlg, (HMENU)IDC_EDIT_H3, NULL, NULL);
+        CreateWindow("STATIC", "H4 (pKa4):", WS_VISIBLE | WS_CHILD, x+160, y, 70, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+240, y, 60, 20, dlg, (HMENU)IDC_EDIT_H4, NULL, NULL);
         y += 30;
-        CreateWindow("STATIC", "Ca1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_CA1, NULL, NULL);
-        CreateWindow("STATIC", "Mg1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_MG1, NULL, NULL);
-        CreateWindow("STATIC", "Ba1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_BA1, NULL, NULL);
+        CreateWindow("STATIC", "Ca1:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_CA1, NULL, NULL);
+        CreateWindow("STATIC", "Mg1:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_MG1, NULL, NULL);
+        CreateWindow("STATIC", "Ba1:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_BA1, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "Cd1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_CD1, NULL, NULL);
-        CreateWindow("STATIC", "Sr1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_SR1, NULL, NULL);
-        CreateWindow("STATIC", "Mn1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_MN1, NULL, NULL);
+        CreateWindow("STATIC", "Cd1:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_CD1, NULL, NULL);
+        CreateWindow("STATIC", "Sr1:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_SR1, NULL, NULL);
+        CreateWindow("STATIC", "Mn1:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_DMN1, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "Fe1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_FE1, NULL, NULL);
-        CreateWindow("STATIC", "Cu1:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_CU1, NULL, NULL);
-        CreateWindow("STATIC", "Zn1:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_ZN1, NULL, NULL);
-        y += 30;
-        CreateWindow("STATIC", "ΔH1:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH1, NULL, NULL);
-        CreateWindow("STATIC", "ΔH2:", WS_VISIBLE | WS_CHILD, x+95, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+130, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH2, NULL, NULL);
-        CreateWindow("STATIC", "ΔH3:", WS_VISIBLE | WS_CHILD, x+190, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+225, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH3, NULL, NULL);
+        CreateWindow("STATIC", "Fe1:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_FE1, NULL, NULL);
+        CreateWindow("STATIC", "Cu1:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_CU1, NULL, NULL);
+        CreateWindow("STATIC", "Zn1:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_ZN1, NULL, NULL);
+        y += 35;
+        CreateWindow("STATIC", "ΔH1:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_DH1, NULL, NULL);
+        CreateWindow("STATIC", "ΔH2:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_DH2, NULL, NULL);
+        CreateWindow("STATIC", "ΔH3:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_DH3, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "ΔH4:", WS_VISIBLE | WS_CHILD, x, y, 30, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+35, y, 50, 20, dlg, (HMENU)IDC_EDIT_DH4, NULL, NULL);
-        y += 30;
-        CreateWindow("STATIC", "ΔCa1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCA1, NULL, NULL);
-        CreateWindow("STATIC", "ΔMg1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DMG1, NULL, NULL);
-        CreateWindow("STATIC", "ΔBa1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DBA1, NULL, NULL);
+        CreateWindow("STATIC", "ΔH4:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_DH4, NULL, NULL);
+        y += 35;
+        CreateWindow("STATIC", "ΔCa:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_DCA1, NULL, NULL);
+        CreateWindow("STATIC", "ΔMg:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_DMG1, NULL, NULL);
+        CreateWindow("STATIC", "ΔBa:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_DBA1, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "ΔCd1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCD1, NULL, NULL);
-        CreateWindow("STATIC", "ΔSr1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DSR1, NULL, NULL);
-        CreateWindow("STATIC", "ΔMn1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DMN1, NULL, NULL);
+        CreateWindow("STATIC", "ΔCd:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_DCD1, NULL, NULL);
+        CreateWindow("STATIC", "ΔSr:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_DSR1, NULL, NULL);
+        CreateWindow("STATIC", "ΔMn:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_DMN1, NULL, NULL);
         y += 25;
-        CreateWindow("STATIC", "ΔFe1:", WS_VISIBLE | WS_CHILD, x, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+40, y, 45, 20, dlg, (HMENU)IDC_EDIT_DFE1, NULL, NULL);
-        CreateWindow("STATIC", "ΔCu1:", WS_VISIBLE | WS_CHILD, x+95, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+135, y, 45, 20, dlg, (HMENU)IDC_EDIT_DCU1, NULL, NULL);
-        CreateWindow("STATIC", "ΔZn1:", WS_VISIBLE | WS_CHILD, x+190, y, 35, 20, dlg, NULL, NULL, NULL);
-        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+230, y, 45, 20, dlg, (HMENU)IDC_EDIT_DZN1, NULL, NULL);
-        y += 40;
-        CreateWindow("BUTTON", "New Ligand", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 100, y, 80, 25, dlg, (HMENU)IDC_NEW_LIGAND_BTN, NULL, NULL);
-        CreateWindow("BUTTON", "Save", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 200, y, 80, 25, dlg, (HMENU)IDC_SAVE_BTN, NULL, NULL);
-        CreateWindow("BUTTON", "Cancel", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 300, y, 80, 25, dlg, (HMENU)IDC_CANCEL_BTN, NULL, NULL);
+        CreateWindow("STATIC", "ΔFe:", WS_VISIBLE | WS_CHILD, x, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+45, y, 60, 20, dlg, (HMENU)IDC_EDIT_DFE1, NULL, NULL);
+        CreateWindow("STATIC", "ΔCu:", WS_VISIBLE | WS_CHILD, x+120, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+165, y, 60, 20, dlg, (HMENU)IDC_EDIT_DCU1, NULL, NULL);
+        CreateWindow("STATIC", "ΔZn:", WS_VISIBLE | WS_CHILD, x+240, y, 40, 20, dlg, NULL, NULL, NULL);
+        CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER, x+285, y, 60, 20, dlg, (HMENU)IDC_EDIT_DZN1, NULL, NULL);
+        y += 45;
+        CreateWindow("BUTTON", "Save Changes", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 200, y, 120, 30, dlg, (HMENU)IDC_SAVE_BTN, NULL, NULL);
+        CreateWindow("BUTTON", "Close", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 340, y, 100, 30, dlg, (HMENU)IDC_CANCEL_BTN, NULL, NULL);
         g_editorLigands = GetAllLigands();
         PopulateLigandList(dlg);
-        if (g_ligandEditorMode == LigandEditorMode::Add) {
-            SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, -1, 0);
-        } else if (!g_editorLigands.empty()) {
-            SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, 0, 0);
-            LoadLigandData(dlg, 0);
-        }
+        if (!g_editorLigands.empty()) { SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, 0, 0); LoadLigandData(dlg, 0); }
         return 0;
     }
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case IDC_LIGAND_LIST:
-            if (HIWORD(wParam) == LBN_SELCHANGE) {
-                int index = SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_GETCURSEL, 0, 0);
-                LoadLigandData(dlg, index);
-            }
-            break;
-        case IDC_NEW_LIGAND_BTN:
-            SetTextInCtrl(dlg, IDC_EDIT_NAME, ""); SetTextInCtrl(dlg, IDC_EDIT_VALENCE, ""); SetTextInCtrl(dlg, IDC_EDIT_H1, ""); SetTextInCtrl(dlg, IDC_EDIT_H2, ""); SetTextInCtrl(dlg, IDC_EDIT_H3, ""); SetTextInCtrl(dlg, IDC_EDIT_H4, "");
-            SetTextInCtrl(dlg, IDC_EDIT_CA1, ""); SetTextInCtrl(dlg, IDC_EDIT_MG1, ""); SetTextInCtrl(dlg, IDC_EDIT_BA1, ""); SetTextInCtrl(dlg, IDC_EDIT_CD1, ""); SetTextInCtrl(dlg, IDC_EDIT_SR1, ""); SetTextInCtrl(dlg, IDC_EDIT_MN1, ""); SetTextInCtrl(dlg, IDC_EDIT_FE1, ""); SetTextInCtrl(dlg, IDC_EDIT_CU1, ""); SetTextInCtrl(dlg, IDC_EDIT_ZN1, "");
-            SetTextInCtrl(dlg, IDC_EDIT_DH1, ""); SetTextInCtrl(dlg, IDC_EDIT_DH2, ""); SetTextInCtrl(dlg, IDC_EDIT_DH3, ""); SetTextInCtrl(dlg, IDC_EDIT_DH4, ""); SetTextInCtrl(dlg, IDC_EDIT_DCA1, ""); SetTextInCtrl(dlg, IDC_EDIT_DMG1, ""); SetTextInCtrl(dlg, IDC_EDIT_DBA1, ""); SetTextInCtrl(dlg, IDC_EDIT_DCD1, ""); SetTextInCtrl(dlg, IDC_EDIT_DSR1, ""); SetTextInCtrl(dlg, IDC_EDIT_DMN1, ""); SetTextInCtrl(dlg, IDC_EDIT_DFE1, ""); SetTextInCtrl(dlg, IDC_EDIT_DCU1, ""); SetTextInCtrl(dlg, IDC_EDIT_DZN1, "");
-            SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, -1, 0);
-            g_ligandEditorMode = LigandEditorMode::Add;
+            if (HIWORD(wParam) == LBN_SELCHANGE) { int index = SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_GETCURSEL, 0, 0); LoadLigandData(dlg, index); }
             break;
         case IDC_SAVE_BTN: {
             int index = SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_GETCURSEL, 0, 0);
-            bool createNew = (g_ligandEditorMode == LigandEditorMode::Add) || (index < 0);
-            if (createNew) {
-                Ligand newLigand; newLigand.name = GetTextFromCtrl(dlg, IDC_EDIT_NAME);
-                if (newLigand.name.empty()) { MessageBox(dlg, "Name required.", "Error", MB_ICONWARNING); break; }
-                newLigand.valence = atoi(GetTextFromCtrl(dlg, IDC_EDIT_VALENCE).c_str());
-                newLigand.constants.log_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H1).c_str());
-                newLigand.constants.log_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H2).c_str());
-                newLigand.constants.log_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H3).c_str());
-                newLigand.constants.log_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_H4).c_str());
-                newLigand.constants.Ca1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CA1).c_str());
-                newLigand.constants.Mg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MG1).c_str());
-                newLigand.constants.Ba1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_BA1).c_str());
-                newLigand.constants.Cd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CD1).c_str());
-                newLigand.constants.Sr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_SR1).c_str());
-                newLigand.constants.Mn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_MN1).c_str());
-                newLigand.constants.X1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_FE1).c_str());
-                newLigand.constants.Cu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_CU1).c_str());
-                newLigand.constants.Zn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_ZN1).c_str());
-                newLigand.constants.dlog_K1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH1).c_str());
-                newLigand.constants.dlog_K2 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH2).c_str());
-                newLigand.constants.dlog_K3 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH3).c_str());
-                newLigand.constants.dlog_K4 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DH4).c_str());
-                newLigand.constants.dCa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCA1).c_str());
-                newLigand.constants.dMg1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMG1).c_str());
-                newLigand.constants.dBa1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DBA1).c_str());
-                newLigand.constants.dCd1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCD1).c_str());
-                newLigand.constants.dSr1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DSR1).c_str());
-                newLigand.constants.dMn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DMN1).c_str());
-                newLigand.constants.dX1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DFE1).c_str());
-                newLigand.constants.dCu1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DCU1).c_str());
-                newLigand.constants.dZn1 = atof(GetTextFromCtrl(dlg, IDC_EDIT_DZN1).c_str());
-                g_editorLigands.push_back(newLigand);
-                g_solver.AddLigand(newLigand);
-                PopulateLigandList(dlg);
-                SendMessage(GetDlgItem(dlg, IDC_LIGAND_LIST), LB_SETCURSEL, g_editorLigands.size() - 1, 0);
-                g_ligandEditorMode = LigandEditorMode::Edit;
-            } else { SaveLigandData(dlg, index); }
-            SaveLigandsToFile(); InitializeAppData(); MessageBox(dlg, "Saved.", "Success", MB_OK);
+            if (index >= 0) { SaveLigandData(dlg, index); SaveLigandsToFile(); InitializeAppData(); MessageBox(dlg, "Saved stability constants to database.", "Success", MB_OK); }
             break;
         }
         case IDC_CANCEL_BTN: SendMessage(dlg, WM_CLOSE, 0, 0); break;
@@ -464,10 +370,10 @@ static bool ShowLigandEditorDialog(HWND parent) {
         WNDCLASSEXA wc; ZeroMemory(&wc, sizeof(WNDCLASSEXA));
         wc.cbSize = sizeof(WNDCLASSEXA); wc.style = CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc = LigandEditorProc; wc.hInstance = GetModuleHandleA(NULL);
-        wc.hCursor = LoadCursorA(NULL, IDC_ARROW); wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW); wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wc.lpszClassName = "LigandEditorDialog"; RegisterClassExA(&wc); classRegistered = true;
     }
-    HWND dlg = CreateWindowExA(WS_EX_DLGMODALFRAME, "LigandEditorDialog", "Ligand Editor", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 450, 650, parent, NULL, GetModuleHandleA(NULL), NULL);
+    HWND dlg = CreateWindowExA(WS_EX_DLGMODALFRAME, "LigandEditorDialog", "Ligand Stability Constants Editor", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT, 650, 650, parent, NULL, GetModuleHandleA(NULL), NULL);
     ShowWindow(dlg, SW_SHOW); UpdateWindow(dlg); EnableWindow(parent, FALSE);
     MSG msg; while (IsWindow(dlg) && GetMessage(&msg, NULL, 0, 0)) { if (!IsDialogMessage(dlg, &msg)) { TranslateMessage(&msg); DispatchMessage(&msg); } }
     EnableWindow(parent, TRUE); SetForegroundWindow(parent); return true;
@@ -478,7 +384,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
     case WM_CREATE: {
         HMENU hMenu = CreateMenu();
         HMENU hFile = CreatePopupMenu(); AppendMenu(hFile, MF_STRING, IDM_FILE_NEW, "&New Calculation\tCtrl+N"); AppendMenu(hFile, MF_SEPARATOR, 0, NULL); AppendMenu(hFile, MF_STRING, IDM_FILE_EXIT, "E&xit"); AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFile, "&File");
-        HMENU hEdit = CreatePopupMenu(); AppendMenu(hEdit, MF_STRING, IDM_FILE_ADD_LIGAND, "&Add Ligand..."); AppendMenu(hEdit, MF_STRING, IDM_LIGAND_EDITOR, "&Ligand Editor..."); AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hEdit, "&Edit");
+        HMENU hEdit = CreatePopupMenu(); AppendMenu(hEdit, MF_STRING, IDM_LIGAND_EDITOR, "&Ligand Editor..."); AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hEdit, "&Edit");
         HMENU hOptions = CreatePopupMenu(); AppendMenu(hOptions, MF_STRING, IDM_MODE_WEBMAXC, "WebMaxC Legacy Mode"); AppendMenu(hOptions, MF_STRING, IDM_MODE_STANDARD, "Industry Standard Mode (Davies)"); CheckMenuItem(hOptions, IDM_MODE_WEBMAXC, MF_BYCOMMAND | MF_CHECKED); AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hOptions, "&Options");
         HMENU hHelp = CreatePopupMenu(); AppendMenu(hHelp, MF_STRING, IDM_HELP_CONSTANTS, "&Lookup Stability Constants..."); AppendMenu(hHelp, MF_STRING, IDM_HELP_ABOUT, "&About"); AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hHelp, "&Help");
         SetMenu(hwnd, hMenu);
@@ -546,8 +452,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             SetOutputText(hwnd, "Ready. Configure ligands and solution parameters, then click Calculate.");
             SetDlgItemText(hwnd, IDC_CALCULATE_BTN, "Calculate"); g_calculationDone = false; return 0;
         case IDM_FILE_EXIT: PostQuitMessage(0); return 0;
-        case IDM_FILE_ADD_LIGAND: g_ligandEditorMode = LigandEditorMode::Add; ShowLigandEditorDialog(hwnd); return 0;
-        case IDM_LIGAND_EDITOR: g_ligandEditorMode = LigandEditorMode::Edit; ShowLigandEditorDialog(hwnd); return 0;
+        case IDM_LIGAND_EDITOR: ShowLigandEditorDialog(hwnd); return 0;
         case IDM_HELP_CONSTANTS: ShellExecute(NULL, "open", "https://n-hatada.github.io/stability-constant-explorer/english.html", NULL, NULL, SW_SHOWNORMAL); return 0;
         case IDM_MODE_WEBMAXC: {
             SystemParameters params = g_solver.GetParameters(); params.mode = SystemParameters::SolverMode::WebMaxC; g_solver.SetParameters(params);
